@@ -39,15 +39,16 @@ warnings.filterwarnings("ignore")
 
 hend = 'CHANGE'
 print('HEPP')
-with Browser('phantomjs', load_images=False) as browser:
+with Browser("phantomjs") as browser:
     browser.driver.set_window_size(1920, 1080)
-    browser.visit('https://www.fz.se')
-    text = browser.find_by_css('a.pli-label')
-    hend = text
-    for t in text:
+    browser.visit('https://morph.io')
+    hend = browser.html
+    #text = browser.find_by_css('button.btn-primary')
+    #hend = text
+    #for t in text:
         #print(t)
         #print(t.text)
         #print(t.html)
-        hend = t['href']
+        #hend = t['href']
 print('HUPP')
 print(hend)

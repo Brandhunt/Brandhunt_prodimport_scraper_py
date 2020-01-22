@@ -34,6 +34,7 @@ from splinter import Browser
 # called "data.sqlite" in the current working directory which has at least a table
 # called "data".
 
+print('HEPP')
 with Browser('phantomjs', load_images=False) as browser:
     browser.visit('https://www.fz.se')
     browser.driver.set_window_size(1280, 1024)

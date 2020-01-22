@@ -34,8 +34,8 @@ from splinter import Browser
 # called "data.sqlite" in the current working directory which has at least a table
 # called "data".
 
-import warnings
-warnings.filterwarnings("ignore")
+#import warnings
+#warnings.filterwarnings("ignore")
 
 hend = 'CHANGE'
 print('HEPP')

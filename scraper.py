@@ -1,3 +1,14 @@
+from collections import namedtuple
+import datetime as dt
+from functools import reduce
+import itertools as it
+import re
+import sqlite3
+from urllib.parse import parse_qs, urljoin, urlparse, quote as urlquote
+
+from selenium.common.exceptions import WebDriverException
+from splinter import Browser
+
 # This is a template for a Python scraper on morph.io (https://morph.io)
 # including some code snippets below that you should find helpful
 
@@ -22,3 +33,6 @@
 # All that matters is that your final data is written to an SQLite database
 # called "data.sqlite" in the current working directory which has at least a table
 # called "data".
+
+with Browser('phantomjs', load_images=False) as browser:
+        browser.visit(base_url)

@@ -42,7 +42,7 @@ print('HEPP')
 with Browser('phantomjs', load_images=False) as browser:
     browser.visit('https://www.fz.se')
     browser.driver.set_window_size(1920, 1080)
-    text = browser.find_by_css('pli-label')
+    text = browser.find_by_css('a.pli-label')
     hend = text
     for t in text:
         print(t)

@@ -37,6 +37,7 @@ from splinter import Browser
 import warnings
 warnings.filterwarnings("ignore")
 
+hend = ''
 print('HEPP')
 with Browser('phantomjs', load_images=False) as browser:
     browser.visit('https://www.fz.se')
@@ -46,3 +47,6 @@ with Browser('phantomjs', load_images=False) as browser:
         print(t)
         print(t.text)
         print(t.html)
+        hend = t.html
+print('HUPP')
+print(hend)

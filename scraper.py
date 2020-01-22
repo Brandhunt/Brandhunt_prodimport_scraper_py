@@ -37,16 +37,16 @@ from splinter import Browser
 import warnings
 warnings.filterwarnings("ignore")
 
-hend = ''
+hend = 'CHANGE'
 print('HEPP')
 with Browser('phantomjs', load_images=False) as browser:
     browser.visit('https://www.fz.se')
-    browser.driver.set_window_size(1280, 1024)
-    text = browser.find_by_css("button[type='submit']")
+    browser.driver.set_window_size(1920, 1080)
+    text = browser.find_by_css('pli-label')
+    hend = text
     for t in text:
         print(t)
         print(t.text)
         print(t.html)
-        hend = t.html
 print('HUPP')
 print(hend)

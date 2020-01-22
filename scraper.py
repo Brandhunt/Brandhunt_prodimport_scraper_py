@@ -45,8 +45,9 @@ with Browser('phantomjs', load_images=False) as browser:
     text = browser.find_by_css('a.pli-label')
     hend = text
     for t in text:
-        print(t)
-        print(t.text)
-        print(t.html)
+        #print(t)
+        #print(t.text)
+        #print(t.html)
+        hend = t['href']
 print('HUPP')
 print(hend)

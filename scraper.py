@@ -39,4 +39,5 @@ with Browser('phantomjs', load_images=False) as browser:
     browser.driver.set_window_size(1280, 1024)
     text = browser.find_by_css("button[type='submit']")
     for t in text:
-        print t.text
+        print(t.text)
+        print(t.html)

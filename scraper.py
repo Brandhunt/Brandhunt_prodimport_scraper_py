@@ -34,11 +34,15 @@ from splinter import Browser
 # called "data.sqlite" in the current working directory which has at least a table
 # called "data".
 
+import warnings
+warnings.filterwarnings("ignore")
+
 print('HEPP')
 with Browser('phantomjs', load_images=False) as browser:
     browser.visit('https://www.fz.se')
     browser.driver.set_window_size(1280, 1024)
     text = browser.find_by_css("button[type='submit']")
     for t in text:
+        print(t)
         print(t.text)
         print(t.html)

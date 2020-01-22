@@ -13,7 +13,7 @@ import logging
 import scraperwiki
 import sqlite3
 import time
-import urllib2
+import urllib
 import lxml.html
 from splinter import Browser
 from selenium.common.exceptions import TimeoutException

@@ -39,7 +39,7 @@ warnings.filterwarnings("ignore")
 
 hend = 'CHANGE'
 print('HEPP')
-"browser = Browser("phantomjs")
+#browser = Browser("phantomjs")
 with Browser() as browser:
     browser.driver.set_window_size(1920, 1080)
     browser.visit('https://morph.io')

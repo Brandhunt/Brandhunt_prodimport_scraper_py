@@ -35,4 +35,4 @@ from splinter import Browser
 # called "data".
 
 with Browser('phantomjs', load_images=False) as browser:
-        browser.visit(base_url)
+        browser.visit('https://www.fz.se')

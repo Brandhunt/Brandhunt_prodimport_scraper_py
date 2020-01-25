@@ -219,7 +219,7 @@ for scrapsite in jsonscrapsites:
                         removeon404 = True
                 try:
                     scraperwiki.sqlite.save(unique_keys=['scrapeurl'],\
-                                urls={'scrapeurl': scrapsite['scrapeurl'],\
+                                data={'scrapeurl': scrapsite['scrapeurl'],\
                                       'domain': scrapsite['scrapefield']['domain'],\
                                       'domainname': scrapsite['scrapefield']['domainname'],\
                                       'currencysymbol': scrapsite['scrapefield']['currencysymbol'],\
@@ -239,7 +239,7 @@ for scrapsite in jsonscrapsites:
                                       'productlatestonly': scrapsite['scrapefield']['productlatestonly'],\
                                       'productignorethisone': scrapsite['scrapefield']['productignorethisone'],\
                                       'productnocommaasdelimiter': scrapsite['scrapefield']['productnocommaasdelimiter'],\
-                                      'shouldberemoved': removeon404})
+                                      'shouldberemoved': removeon404}, table_name = 'urls')
                     #'notfound': notfound,\
                     continue
                 except:
@@ -280,7 +280,7 @@ for scrapsite in jsonscrapsites:
                                 continue
                             else:
                                 scraperwiki.sqlite.save(unique_keys=['scrapeurl'],\
-                                urls={'scrapeurl': url,\
+                                data={'scrapeurl': url,\
                                       'domain': existingurl[0]['scrapefield']['domain'],\
                                       'domainname': existingurl[0]['scrapefield']['domainname'],\
                                       'currencysymbol': existingurl[0]['scrapefield']['currencysymbol'],\
@@ -300,7 +300,7 @@ for scrapsite in jsonscrapsites:
                                       'productlatestonly': existingurl[0]['scrapefield']['productlatestonly'],\
                                       'productignorethisone': existingurl[0]['scrapefield']['productignorethisone'],\
                                       'productnocommaasdelimiter': existingurl[0]['scrapefield']['productnocommaasdelimiter'],\
-                                      'shouldberemoved': False})
+                                      'shouldberemoved': False}, table_name = 'urls')
                                 jsonscrapsites.append({'scrapeurl': url,\
                                       'scrapefield': {\
                                          'domain': existingurl[0]['scrapefield']['domain'],\
@@ -394,9 +394,9 @@ for scrapsite in jsonscrapsites:
                                 count = 1
                                 while count <= jsonprodexists.len():
                                     scraperwiki.sqlite.save(unique_keys=['count'],\
-                                        exisprodcache = {'count': ((count - 1) + doesprodexistoffset),\
+                                        data = {'count': ((count - 1) + doesprodexistoffset),\
                                         'prodexcerpt': jsonprodexists[count],\
-                                              'date': jsonprodexists[0]})
+                                              'date': jsonprodexists[0]}, table_name = 'exisprodcache')
                                     count = count + 1
                                 doesprodexistoffset = doesprodexistoffset + limit
                                 r = requests.get(wp_connectwp_url_6 + str(doesprodexistoffset) + '/' + str(limit) + '/', headers=headers)
@@ -417,9 +417,9 @@ for scrapsite in jsonscrapsites:
                                     count = 1
                                     while count <= jsonprodexists.len():
                                         scraperwiki.sqlite.save(unique_keys=['count'],\
-                                            exisprodcache = {'count': ((count - 1) + doesprodexistoffset),\
+                                            data = {'count': ((count - 1) + doesprodexistoffset),\
                                             'prodexcerpt': jsonprodexists[count],\
-                                                  'date': jsonprodexists[0]})
+                                                  'date': jsonprodexists[0]}, table_name = 'exisprodcache')
                                         count = count + 1
                                     doesprodexistoffset = doesprodexistoffset + limit
                                     r = requests.get(wp_connectwp_url_6 + str(doesprodexistoffset) + '/' + str(limit) + '/', headers=headers)
@@ -705,7 +705,7 @@ for scrapsite in jsonscrapsites:
                             print(traceback.format_exc())
                     #MAYBE GET NEWDOMAIN HERE?
                     scraperwiki.sqlite.save(unique_keys=['scrapeurl'],\
-                                            prodstocreate={'domain': scrapsite['scrapefield']['domain'],\
+                                            data={'domain': scrapsite['scrapefield']['domain'],\
                                                   'scrapeurl': scrapsite['scrapeurl'],\
                                                   'producturl': prod_url,\
                                                   'currencysymbol': scrapsite['scrapefield']['currencysymbol'],\
@@ -721,7 +721,7 @@ for scrapsite in jsonscrapsites:
                                                   'soldout': soldout,\
                                                   'imageurls': json.dumps(image_urls_valid),\
                                                   'logoimageurls': json.dumps(productlogourls),\
-                                                  'miscdetails': scrapedmiscitems})        
+                                                  'miscdetails': scrapedmiscitems}, table_name = 'prodstocreate')        
         else:
             continue
     else:

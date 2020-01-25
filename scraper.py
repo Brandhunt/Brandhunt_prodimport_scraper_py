@@ -169,9 +169,7 @@ offset = int(os.environ['MORPH_PRODIMPURL_OFFSET'])
 doesprodexistoffset = int(os.environ['MORPH_PRODCHECK_OFFSET'])
 limit = 25
 
-#r = requests.get(wp_connectwp_url, headers=headers)
 r = requests.get(wp_connectwp_url + str(offset) + '/' + str(limit) + '/', headers=headers)
-#jsonprods = r.json()
 jsonscrapsites = json.loads(r.content)
 
 r = requests.get(wp_connectwp_url_2, headers=headers)
@@ -193,6 +191,7 @@ jsonprodexists = json.loads(r.content)
 
 while jsonscrapsites:
     for scrapsite in jsonscrapsites:
+        print(scrapsite)
         # --> Ignore current product import URL if neccessary!
         if scrapsite['scrapefield']['productignorethisone'] == '1':
             continue

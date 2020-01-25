@@ -154,10 +154,10 @@ def doesscrapeurlexist(scrapesitelist, scrapeurl):
 wp_username = os.environ['MORPH_WP_USERNAME']
 wp_password = os.environ['MORPH_WP_PASSWORD']
 wp_connectwp_url = os.environ['MORPH_WP_CONNECT_URL']
-wp_connectwp_url_2 = os.environ['MORPH_WP_CONNECT_URL_2']
+#wp_connectwp_url_2 = os.environ['MORPH_WP_CONNECT_URL_2']
 wp_connectwp_url_3 = os.environ['MORPH_WP_CONNECT_URL_3']
-wp_connectwp_url_4 = os.environ['MORPH_WP_CONNECT_URL_4']
-wp_connectwp_url_5 = os.environ['MORPH_WP_CONNECT_URL_5']
+#wp_connectwp_url_4 = os.environ['MORPH_WP_CONNECT_URL_4']
+#wp_connectwp_url_5 = os.environ['MORPH_WP_CONNECT_URL_5']
 wp_connectwp_url_6 = os.environ['MORPH_WP_CONNECT_URL_6']
 
 encodestring = wp_username + ':' + wp_password;
@@ -172,23 +172,22 @@ limit = 25
 r = requests.get(wp_connectwp_url + str(offset) + '/' + str(limit) + '/', headers=headers)
 jsonscrapsites = json.loads(r.content)
 
-r = requests.get(wp_connectwp_url_2, headers=headers)
-jsonwebsites = json.loads(r.content)
+#r = requests.get(wp_connectwp_url_2, headers=headers)
+#jsonwebsites = json.loads(r.content)
 
 r = requests.get(wp_connectwp_url_3, headers=headers)
 jsonprodattr = json.loads(r.content)
 
-r = requests.get(wp_connectwp_url_4, headers=headers)
-jsoncatsizetypemaps = json.loads(r.content)
+#r = requests.get(wp_connectwp_url_4, headers=headers)
+#jsoncatsizetypemaps = json.loads(r.content)
 
-r = requests.get(wp_connectwp_url_5, headers=headers)
-jsoncatmaps = json.loads(r.content)
+#r = requests.get(wp_connectwp_url_5, headers=headers)
+#jsoncatmaps = json.loads(r.content)
 
 r = requests.get(wp_connectwp_url_6 + str(doesprodexistoffset) + '/' + str(limit) + '/', headers=headers)
 jsonprodexists = json.loads(r.content)
 
 # --> Decode and handle these product import URLs!
-
 while jsonscrapsites:
     for scrapsite in jsonscrapsites:
         print(json.dumps(scrapsite))

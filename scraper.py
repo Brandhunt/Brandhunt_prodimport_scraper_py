@@ -265,7 +265,7 @@ for scrapsite in jsonscrapsites:
             url_elements = root.cssselect(scrapsite['scrapefield']['productnumberselector'])
             if url_elements:
                 nextURLs = graburls(etree.tostring(url_elements[int(int(url_elements.len()) - 1)]), False)
-        else:
+        elif scrapsite['scrapefield']['phantomjsimport'] != 'phantomjsimport_default':
             print("Invalid scraping method - Can't use 'Standard' scraping type with method '" + scrapsite['scrapefield']['phantomjsimport'] + "'!")
             continue
         # >>> HANDLE HTML <<< #

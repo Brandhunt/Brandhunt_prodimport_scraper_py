@@ -169,8 +169,8 @@ offset = int(os.environ['MORPH_PRODIMPURL_OFFSET'])
 doesprodexistoffset = int(os.environ['MORPH_PRODCHECK_OFFSET'])
 limit = 25
 
-r = requests.get(wp_connectwp_url + str(offset) + '/' + str(limit) + '/', headers=headers)
-print(wp_connectwp_url + str(offset) + '/' + str(limit) + '/')
+#r = requests.get(wp_connectwp_url + str(offset) + '/' + str(limit) + '/', headers=headers)
+r = requests.get(wp_connectwp_url, headers=headers)
 jsonscrapsites = json.loads(r.content)
 
 #r = requests.get(wp_connectwp_url_2, headers=headers)
@@ -189,208 +189,231 @@ r = requests.get(wp_connectwp_url_6 + str(doesprodexistoffset) + '/' + str(limit
 jsonprodexists = json.loads(r.content)
 
 # --> Decode and handle these product import URLs!
-while jsonscrapsites:
-    print(json.dumps(jsonscrapsites))
-    for scrapsite in jsonscrapsites:
-        print(json.dumps(scrapsite))
-        # --> Ignore current product import URL if neccessary!
-        if scrapsite['scrapefield']['productignorethisone'] == '1':
+#while jsonscrapsites:
+#print(json.dumps(jsonscrapsites))
+for scrapsite in jsonscrapsites:
+    #print(json.dumps(scrapsite))
+    # --> Ignore current product import URL if neccessary!
+    if scrapsite['scrapefield']['productignorethisone'] == '1':
+        continue
+    # --> If scraping a new, unadded scrapesite - Make sure to set default values where neccessary!
+    if not scrapsite['scrapefield']['scrapetype']:
+        scrapsite['scrapefield']['scrapetype'] = 'standard'
+    if not scrapsite['scrapefield']['phantomjsimport']:
+        scrapsite['scrapefield']['phantomjsimport'] = 'phantomjsimport_pagenumber'
+    # >>> GET THE HTML <<< #
+    if scrapsite['scrapefield']['scrapetype'] == 'standard':
+        html = ''
+        root = ''
+        nextURLs = ''
+        try:
+            html = scraperwiki.scrape(scrapsite['scrapeurl'])
+            #print("HTML:")
+            #print(html)
+        except HTTPError as err:
+            if err.code == 404:
+                notfound = True
+                removeon404 = False
+                if scrapsite['productmisc']:
+                    if scrapsite['productmisc'].find('allow_remove_on_404'):
+                        removeon404 = True
+                try:
+                    scraperwiki.sqlite.save(unique_keys=['scrapeurl'],\
+                                urls={'scrapeurl': scrapsite['scrapeurl'],\
+                                      'domain': scrapsite['scrapefield']['domain'],\
+                                      'domainname': scrapsite['scrapefield']['domainname'],\
+                                      'currencysymbol': scrapsite['scrapefield']['currencysymbol'],\
+                                      'type': scrapsite['scrapefield']['type'],\
+                                      'scrapetype': scrapsite['scrapefield']['scrapetype'],\
+                                      'phantomjsimport': scrapsite['scrapefield']['phantomjsimport'],\
+                                      'titleselector': scrapsite['scrapefield']['titleselector'],\
+                                      'productselector': scrapsite['scrapefield']['productselector'],\
+                                      'priceselector': scrapsite['scrapefield']['priceselector'],\
+                                      'urlselector': scrapsite['scrapefield']['urlselector'],\
+                                      'salespriceselector': scrapsite['scrapefield']['salespriceselector'],\
+                                      'imageselector': scrapsite['scrapefield']['imageselector'],\
+                                      'productlogoselector': scrapsite['scrapefield']['productlogoselector'],\
+                                      'domainmisc': scrapsite['scrapefield']['domainmisc'],\
+                                      'productnumberselector': scrapsite['scrapefield']['productnumberselector'],\
+                                      'productloadmoreselector': scrapsite['scrapefield']['productloadmoreselector'],\
+                                      'productlatestonly': scrapsite['scrapefield']['productlatestonly'],\
+                                      'productignorethisone': scrapsite['scrapefield']['productignorethisone'],\
+                                      'productnocommaasdelimiter': scrapsite['scrapefield']['productnocommaasdelimiter'],\
+                                      'shouldberemoved': removeon404})
+                    #'notfound': notfound,\
+                    continue
+                except:
+                    print(traceback.format_exc())
+                    continue
+            else:
+                raise
+        except:
+            #print("Error when scraping URL for product ID " + product['productid'] + ": " + str(sys.exc_info()[0]) + " occured!")
+            print(traceback.format_exc())
+            #HAPP
+        # >>> GET THE HTML ROOT <<< #
+        root = lxml.html.fromstring(html)
+        #print("ROOT:")
+        #for r in root: print r
+        # >>> GET THE NEXT URL(S) <<< #
+        scrapsite['scrapefield']['productnumberselector'] = scrapsite['scrapefield']['productnumberselector'].encode().decode("unicode-escape")
+        if scrapsite['scrapefield']['phantomjsimport'] == 'phantomjsimport_pagenumber':
+            url_elements = root.cssselect(scrapsite['scrapefield']['productnumberselector'])
+            if url_elements:
+                nextURLs = graburls(etree.tostring(url_elements[0]), False)
+        elif scrapsite['scrapefield']['phantomjsimport'] == 'phantomjsimport_pagenumber_alt':
+            url_elements = root.cssselect(scrapsite['scrapefield']['productnumberselector'])
+            if url_elements:
+                nextURLs = graburls(etree.tostring(url_elements[int(int(url_elements.len()) - 1)]), False)
+        else:
+            print("Invalid scraping method - Can't use 'Standard' scraping type with method '" + scrapsite['scrapefield']['phantomjsimport'] + "'!")
             continue
-        # --> If scraping a new, unadded scrapesite - Make sure to set default values where neccessary!
-        if not scrapsite['scrapefield']['scrapetype']:
-            scrapsite['scrapefield']['scrapetype'] = 'standard'
-        if not scrapsite['scrapefield']['phantomjsimport']:
-            scrapsite['scrapefield']['phantomjsimport'] = 'phantomjsimport_pagenumber'
-        # >>> GET THE HTML <<< #
-        if scrapsite['scrapefield']['scrapetype'] == 'standard':
-            html = ''
-            root = ''
-            nextURLs = ''
-            try:
-                html = scraperwiki.scrape(scrapsite['scrapeurl'])
-                #print("HTML:")
-                #print(html)
-            except HTTPError as err:
-                if err.code == 404:
-                    notfound = True
-                    removeon404 = False
-                    if scrapsite['productmisc']:
-                        if scrapsite['productmisc'].find('allow_remove_on_404'):
-                            removeon404 = True
+        # >>> HANDLE HTML <<< #
+        if html != '' and root != '':
+            # --> Go through the "next" URLs - Do they already exists? 
+            # --> Regardless, make sure it's added to the current scraping queue if neccessary
+            if nextURLs:
+                for url in nextURLs:
+                    if url:
+                        existingurl = doesscrapeurlexist(jsonscrapsites, url)
+                        if existingurl != 0:
+                            if existingurl[1] is True:
+                                continue
+                            else:
+                                scraperwiki.sqlite.save(unique_keys=['scrapeurl'],\
+                                urls={'scrapeurl': url,\
+                                      'domain': existingurl[0]['scrapefield']['domain'],\
+                                      'domainname': existingurl[0]['scrapefield']['domainname'],\
+                                      'currencysymbol': existingurl[0]['scrapefield']['currencysymbol'],\
+                                      'type': existingurl[0]['scrapefield']['type'],\
+                                      'scrapetype': existingurl[0]['scrapefield']['scrapetype'],\
+                                      'phantomjsimport': existingurl[0]['scrapefield']['phantomjsimport'],\
+                                      'titleselector': existingurl[0]['scrapefield']['titleselector'],\
+                                      'productselector': existingurl[0]['scrapefield']['productselector'],\
+                                      'priceselector': existingurl[0]['scrapefield']['priceselector'],\
+                                      'urlselector': existingurl[0]['scrapefield']['urlselector'],\
+                                      'salespriceselector': existingurl[0]['scrapefield']['salespriceselector'],\
+                                      'imageselector': existingurl[0]['scrapefield']['imageselector'],\
+                                      'productlogoselector': existingurl[0]['scrapefield']['productlogoselector'],\
+                                      'domainmisc': existingurl[0]['scrapefield']['domainmisc'],\
+                                      'productnumberselector': existingurl[0]['scrapefield']['productnumberselector'],\
+                                      'productloadmoreselector': existingurl[0]['scrapefield']['productloadmoreselector'],\
+                                      'productlatestonly': existingurl[0]['scrapefield']['productlatestonly'],\
+                                      'productignorethisone': existingurl[0]['scrapefield']['productignorethisone'],\
+                                      'productnocommaasdelimiter': existingurl[0]['scrapefield']['productnocommaasdelimiter'],\
+                                      'shouldberemoved': False})
+                                jsonscrapsites.append({'scrapeurl': url,\
+                                      'scrapefield': {\
+                                         'domain': existingurl[0]['scrapefield']['domain'],\
+                                         'domainname': existingurl[0]['scrapefield']['domainname'],\
+                                         'currencysymbol': existingurl[0]['scrapefield']['currencysymbol'],\
+                                         'type': existingurl[0]['scrapefield']['type'],\
+                                         'scrapetype': existingurl[0]['scrapefield']['scrapetype'],\
+                                         'phantomjsimport': existingurl[0]['scrapefield']['phantomjsimport'],\
+                                         'titleselector': existingurl[0]['scrapefield']['titleselector'],\
+                                         'productselector': existingurl[0]['scrapefield']['productselector'],\
+                                         'priceselector': existingurl[0]['scrapefield']['priceselector'],\
+                                         'urlselector': existingurl[0]['scrapefield']['urlselector'],\
+                                         'salespriceselector': existingurl[0]['scrapefield']['salespriceselector'],\
+                                         'imageselector': existingurl[0]['scrapefield']['imageselector'],\
+                                         'productlogoselector': existingurl[0]['scrapefield']['productlogoselector'],\
+                                         'domainmisc': existingurl[0]['scrapefield']['domainmisc'],\
+                                         'productnumberselector': existingurl[0]['scrapefield']['productnumberselector'],\
+                                         'productloadmoreselector': existingurl[0]['scrapefield']['productloadmoreselector'],\
+                                         'productlatestonly': existingurl[0]['scrapefield']['productlatestonly'],\
+                                         'productignorethisone': existingurl[0]['scrapefield']['productignorethisone'],\
+                                         'productnocommaasdelimiter': existingurl[0]['scrapefield']['productnocommaasdelimiter']}})
+                        else:
+                            print('Current URL "' + url + '" is not of the current domain or scraping URL - It will be skipped!')
+                            continue
+                    else:
+                        print('FOUND THE END OF THE NEXT URL!')
+            print("Currently scraping URL " + str(scrapsite['scrapeurl']))
+            # >>> GET THE PRODUCTS <<< #
+            scrapsite['scrapefield']['productselector'] = scrapsite['scrapefield']['productselector'].encode().decode("unicode-escape")
+            product_elements = root.cssselect(scrapsite['scrapefield']['productselector'])
+            for prod_el in product_elements:
+                if prod_el is not None:
+                    prod_html = etree.tostring(prod_el)
+                    prod_root = lxml.html.fromstring(prod_html)
+                    prod_sold_out = False
+                    # >>> GET THE SCRAPED PRODUCT URL <<< #
+                    prod_url = ''
+                    prod_url_html = ''
                     try:
-                        scraperwiki.sqlite.save(unique_keys=['scrapeurl'],\
-                                    urls={'scrapeurl': scrapsite['scrapeurl'],\
-                                          'domain': scrapsite['scrapefield']['domain'],\
-                                          'domainname': scrapsite['scrapefield']['domainname'],\
-                                          'currencysymbol': scrapsite['scrapefield']['currencysymbol'],\
-                                          'type': scrapsite['scrapefield']['type'],\
-                                          'scrapetype': scrapsite['scrapefield']['scrapetype'],\
-                                          'phantomjsimport': scrapsite['scrapefield']['phantomjsimport'],\
-                                          'titleselector': scrapsite['scrapefield']['titleselector'],\
-                                          'productselector': scrapsite['scrapefield']['productselector'],\
-                                          'priceselector': scrapsite['scrapefield']['priceselector'],\
-                                          'urlselector': scrapsite['scrapefield']['urlselector'],\
-                                          'salespriceselector': scrapsite['scrapefield']['salespriceselector'],\
-                                          'imageselector': scrapsite['scrapefield']['imageselector'],\
-                                          'productlogoselector': scrapsite['scrapefield']['productlogoselector'],\
-                                          'domainmisc': scrapsite['scrapefield']['domainmisc'],\
-                                          'productnumberselector': scrapsite['scrapefield']['productnumberselector'],\
-                                          'productloadmoreselector': scrapsite['scrapefield']['productloadmoreselector'],\
-                                          'productlatestonly': scrapsite['scrapefield']['productlatestonly'],\
-                                          'productignorethisone': scrapsite['scrapefield']['productignorethisone'],\
-                                          'productnocommaasdelimiter': scrapsite['scrapefield']['productnocommaasdelimiter'],\
-                                          'shouldberemoved': removeon404})
-                        #'notfound': notfound,\
-                        continue
+                        scrapsite['scrapefield']['urlselector'] = scrapsite['scrapefield']['urlselector'].encode().decode("unicode-escape")
+                        product_urL_element = prod_root.cssselect(scrapsite['scrapefield']['urlselector'])[0]
+                        if product_urL_element is not None:
+                            prod_url_html = etree.tostring(product_urL_element)
+                            matches = re.search(r'https?:\/\/(?![^" ]*(?:gif|jpg|jpeg|png|svg))[^" ]+', prod_url_html)
+                            if matches:
+                                prod_url = matches[0]
+                            if prod_url is None or prod_url == '':
+                                matches = re.search(r'href\=\"\K(.*?)\"', prod_url_html)
+                                prod_url = matches[1]
+                                new_prod_url = urljoin(scrapsite['scrapeurl'], prod_url)
+                                if prod_url != new_prod_url:
+                                    prod_url = new_prod_url
+                                if prod_url.find('//') == -1:
+                                    print('Absolute product URL could not be created out of relative URL!')
+                                    continue
+                                if prod_url[0:2] == '//':
+                                    prod_url = 'https:' + prod_url
+                        else:
+                            print('No product URL found. Either broken config or headless browser setup needs change')
                     except:
                         print(traceback.format_exc())
-                        continue
-                else:
-                    raise
-            except:
-                #print("Error when scraping URL for product ID " + product['productid'] + ": " + str(sys.exc_info()[0]) + " occured!")
-                print(traceback.format_exc())
-                #HAPP
-            # >>> GET THE HTML ROOT <<< #
-            root = lxml.html.fromstring(html)
-            #print("ROOT:")
-            #for r in root: print r
-            # >>> GET THE NEXT URL(S) <<< #
-            scrapsite['scrapefield']['productnumberselector'] = scrapsite['scrapefield']['productnumberselector'].encode().decode("unicode-escape")
-            if scrapsite['scrapefield']['phantomjsimport'] == 'phantomjsimport_pagenumber':
-                url_elements = root.cssselect(scrapsite['scrapefield']['productnumberselector'])
-                if url_elements:
-                    nextURLs = graburls(etree.tostring(url_elements[0]), False)
-            elif scrapsite['scrapefield']['phantomjsimport'] == 'phantomjsimport_pagenumber_alt':
-                url_elements = root.cssselect(scrapsite['scrapefield']['productnumberselector'])
-                if url_elements:
-                    nextURLs = graburls(etree.tostring(url_elements[int(int(url_elements.len()) - 1)]), False)
-            else:
-                print("Invalid scraping method - Can't use 'Standard' scraping type with method '" + scrapsite['scrapefield']['phantomjsimport'] + "'!")
-                continue
-            # >>> HANDLE HTML <<< #
-            if html != '' and root != '':
-                # --> Go through the "next" URLs - Do they already exists? 
-                # --> Regardless, make sure it's added to the current scraping queue if neccessary
-                if nextURLs:
-                    for url in nextURLs:
-                        if url:
-                            existingurl = doesscrapeurlexist(jsonscrapsites, url)
-                            if existingurl != 0:
-                                if existingurl[1] is True:
+                    # >>> GET THE SCRAPED PRODUCT TITLE <<< #
+                    prod_title = ''
+                    try:
+                        scrapsite['scrapefield']['titleselector'] = scrapsite['scrapefield']['titleselector'].encode().decode("unicode-escape")
+                        if scrapsite['scrapefield']['titleselector'].find('[multiple],') != -1:
+                            scrapsite['scrapefield']['titleselector'].replace('[multiple],', '')
+                            producttitleparts = prod_root.cssselect(scrapsite['scrapefield']['titleselector'])
+                            for el in producttitleparts:
+                                if el is None:
                                     continue
-                                else:
-                                    scraperwiki.sqlite.save(unique_keys=['scrapeurl'],\
-                                    urls={'scrapeurl': url,\
-                                          'domain': existingurl[0]['scrapefield']['domain'],\
-                                          'domainname': existingurl[0]['scrapefield']['domainname'],\
-                                          'currencysymbol': existingurl[0]['scrapefield']['currencysymbol'],\
-                                          'type': existingurl[0]['scrapefield']['type'],\
-                                          'scrapetype': existingurl[0]['scrapefield']['scrapetype'],\
-                                          'phantomjsimport': existingurl[0]['scrapefield']['phantomjsimport'],\
-                                          'titleselector': existingurl[0]['scrapefield']['titleselector'],\
-                                          'productselector': existingurl[0]['scrapefield']['productselector'],\
-                                          'priceselector': existingurl[0]['scrapefield']['priceselector'],\
-                                          'urlselector': existingurl[0]['scrapefield']['urlselector'],\
-                                          'salespriceselector': existingurl[0]['scrapefield']['salespriceselector'],\
-                                          'imageselector': existingurl[0]['scrapefield']['imageselector'],\
-                                          'productlogoselector': existingurl[0]['scrapefield']['productlogoselector'],\
-                                          'domainmisc': existingurl[0]['scrapefield']['domainmisc'],\
-                                          'productnumberselector': existingurl[0]['scrapefield']['productnumberselector'],\
-                                          'productloadmoreselector': existingurl[0]['scrapefield']['productloadmoreselector'],\
-                                          'productlatestonly': existingurl[0]['scrapefield']['productlatestonly'],\
-                                          'productignorethisone': existingurl[0]['scrapefield']['productignorethisone'],\
-                                          'productnocommaasdelimiter': existingurl[0]['scrapefield']['productnocommaasdelimiter'],\
-                                          'shouldberemoved': False})
-                                    jsonscrapsites.append({'scrapeurl': url,\
-                                          'scrapefield': {\
-                                             'domain': existingurl[0]['scrapefield']['domain'],\
-                                             'domainname': existingurl[0]['scrapefield']['domainname'],\
-                                             'currencysymbol': existingurl[0]['scrapefield']['currencysymbol'],\
-                                             'type': existingurl[0]['scrapefield']['type'],\
-                                             'scrapetype': existingurl[0]['scrapefield']['scrapetype'],\
-                                             'phantomjsimport': existingurl[0]['scrapefield']['phantomjsimport'],\
-                                             'titleselector': existingurl[0]['scrapefield']['titleselector'],\
-                                             'productselector': existingurl[0]['scrapefield']['productselector'],\
-                                             'priceselector': existingurl[0]['scrapefield']['priceselector'],\
-                                             'urlselector': existingurl[0]['scrapefield']['urlselector'],\
-                                             'salespriceselector': existingurl[0]['scrapefield']['salespriceselector'],\
-                                             'imageselector': existingurl[0]['scrapefield']['imageselector'],\
-                                             'productlogoselector': existingurl[0]['scrapefield']['productlogoselector'],\
-                                             'domainmisc': existingurl[0]['scrapefield']['domainmisc'],\
-                                             'productnumberselector': existingurl[0]['scrapefield']['productnumberselector'],\
-                                             'productloadmoreselector': existingurl[0]['scrapefield']['productloadmoreselector'],\
-                                             'productlatestonly': existingurl[0]['scrapefield']['productlatestonly'],\
-                                             'productignorethisone': existingurl[0]['scrapefield']['productignorethisone'],\
-                                             'productnocommaasdelimiter': existingurl[0]['scrapefield']['productnocommaasdelimiter']}})
-                            else:
-                                print('Current URL "' + url + '" is not of the current domain or scraping URL - It will be skipped!')
-                                continue
+                                prod_title = prod_title + el.text + ' '
                         else:
-                            print('FOUND THE END OF THE NEXT URL!')
-                print("Currently scraping URL " + str(scrapsite['scrapeurl']))
-                # >>> GET THE PRODUCTS <<< #
-                scrapsite['scrapefield']['productselector'] = scrapsite['scrapefield']['productselector'].encode().decode("unicode-escape")
-                product_elements = root.cssselect(scrapsite['scrapefield']['productselector'])
-                for prod_el in product_elements:
-                    if prod_el is not None:
-                        prod_html = etree.tostring(prod_el)
-                        prod_root = lxml.html.fromstring(prod_html)
-                        prod_sold_out = False
-                        # >>> GET THE SCRAPED PRODUCT URL <<< #
-                        prod_url = ''
-                        prod_url_html = ''
-                        try:
-                            scrapsite['scrapefield']['urlselector'] = scrapsite['scrapefield']['urlselector'].encode().decode("unicode-escape")
-                            product_urL_element = prod_root.cssselect(scrapsite['scrapefield']['urlselector'])[0]
-                            if product_urL_element is not None:
-                                prod_url_html = etree.tostring(product_urL_element)
-                                matches = re.search(r'https?:\/\/(?![^" ]*(?:gif|jpg|jpeg|png|svg))[^" ]+', prod_url_html)
-                                if matches:
-                                    prod_url = matches[0]
-                                if prod_url is None or prod_url == '':
-                                    matches = re.search(r'href\=\"\K(.*?)\"', prod_url_html)
-                                    prod_url = matches[1]
-                                    new_prod_url = urljoin(scrapsite['scrapeurl'], prod_url)
-                                    if prod_url != new_prod_url:
-                                        prod_url = new_prod_url
-                                    if prod_url.find('//') == -1:
-                                        print('Absolute product URL could not be created out of relative URL!')
-                                        continue
-                                    if prod_url[0:2] == '//':
-                                        prod_url = 'https:' + prod_url
-                            else:
-                                print('No product URL found. Either broken config or headless browser setup needs change')
-                        except:
-                            print(traceback.format_exc())
-                        # >>> GET THE SCRAPED PRODUCT TITLE <<< #
-                        prod_title = ''
-                        try:
-                            scrapsite['scrapefield']['titleselector'] = scrapsite['scrapefield']['titleselector'].encode().decode("unicode-escape")
-                            if scrapsite['scrapefield']['titleselector'].find('[multiple],') != -1:
-                                scrapsite['scrapefield']['titleselector'].replace('[multiple],', '')
-                                producttitleparts = prod_root.cssselect(scrapsite['scrapefield']['titleselector'])
-                                for el in producttitleparts:
-                                    if el is None:
-                                        continue
-                                    prod_title = prod_title + el.text + ' '
-                            else:
-                                title = prod_root.cssselect(scrapsite['scrapefield']['titleselector'])[0].text
-                                if title is not None:
-                                    prod_title = title
-                            if prod_title.strip() == '':
-                                print('Cannot find the product title after trimming!')
-                            else:
-                                prod_title = re.sub('\s+', ' ', prod_title)
-                        except:
-                            print(traceback.format_exc())
-                        # >>> CHECK IF LATEST ONLY <<< #
-                        # --> If the url should be checked for the latest products only(No full import),
-                        # --> then make sure to stop importing the products from the current URL when
-                        # --> we come across a product not previously stored in the database!
-                        if scrapsite['scrapefield']['productlatestonly'] == '1':
-                            existingtable = scraperwiki.sql.table_info('exisprodcache')
-                            if not existingtable:
+                            title = prod_root.cssselect(scrapsite['scrapefield']['titleselector'])[0].text
+                            if title is not None:
+                                prod_title = title
+                        if prod_title.strip() == '':
+                            print('Cannot find the product title after trimming!')
+                        else:
+                            prod_title = re.sub('\s+', ' ', prod_title)
+                    except:
+                        print(traceback.format_exc())
+                    # >>> CHECK IF LATEST ONLY <<< #
+                    # --> If the url should be checked for the latest products only(No full import),
+                    # --> then make sure to stop importing the products from the current URL when
+                    # --> we come across a product not previously stored in the database!
+                    if scrapsite['scrapefield']['productlatestonly'] == '1':
+                        existingtable = scraperwiki.sql.table_info('exisprodcache')
+                        if not existingtable:
+                            while jsonprodexists:
+                                count = 1
+                                while count <= jsonprodexists.len():
+                                    scraperwiki.sqlite.save(unique_keys=['count'],\
+                                        exisprodcache = {'count': ((count - 1) + doesprodexistoffset),\
+                                        'prodexcerpt': jsonprodexists[count],\
+                                              'date': jsonprodexists[0]})
+                                    count = count + 1
+                                doesprodexistoffset = doesprodexistoffset + limit
+                                r = requests.get(wp_connectwp_url_6 + str(doesprodexistoffset) + '/' + str(limit) + '/', headers=headers)
+                                jsonprodexists = json.loads(r.content)
+                        else:
+                            db_date = list(scraperwiki.sql.select('date FROM exisprodcache ORDER BY CAST(date AS INT) ASC LIMIT 1'))[0]
+                            db_date = datetime(year=int(db_date[0:4]),\
+                                               month=int(db_date[4:6]),\
+                                               day=int(db_date[6:8]),\
+                                               hour=int(db_date[8:10]),\
+                                               minute=int(db_date[10:12]),\
+                                               second=int(db_date[12:14]))
+                            current_date = (datetime.utcnow() + timedelta(seconds=60*60))
+                            duration = (current_date - db_date).total_seconds()
+                            hour_diff = divmod(duration, 3600)[0]
+                            if (hour_diff > 24):
                                 while jsonprodexists:
                                     count = 1
                                     while count <= jsonprodexists.len():
@@ -402,332 +425,309 @@ while jsonscrapsites:
                                     doesprodexistoffset = doesprodexistoffset + limit
                                     r = requests.get(wp_connectwp_url_6 + str(doesprodexistoffset) + '/' + str(limit) + '/', headers=headers)
                                     jsonprodexists = json.loads(r.content)
+                        product_search_result = scraperwiki.sql.select('* FROM exisprodcache WHERE prodexcerpt REGEXP ' + scrapsite['scrapefield'] + '')   
+                        if product_search_result:
+                            print("Found product already existing, moving onto next product!");
+                            continue
+                    # >>> GET THE PRICE <<< #
+                    prod_price_elements = ''
+                    prod_price = ''
+                    try:
+                        scrapsite['scrapefield']['priceselector'] = scrapsite['scrapefield']['priceselector'].encode().decode("unicode-escape")
+                        #print(scrapsite['scrapefield']['priceselector'])
+                        if scrapsite['scrapefield']['priceselector'].find('[multiple],') != -1:
+                            scrapsite['scrapefield']['priceselector'].replace('[multiple],', '')
+                            prod_price_elements = root.cssselect(scrapsite['scrapefield']['priceselector'])
+                            for el in prod_price_elements:
+                                if el is None:
+                                    continue
+                                prod_price = prod_price + el.text + ' '
+                            if prod_price != '':
+                                prod_price = re.sub(r'([^a-zA-Z]\w+\%+)', '', prod_price)
+                        else:
+                            prod_price_elements = root.cssselect(scrapsite['scrapefield']['priceselector'])
+                            if prod_price_elements:
+                                for price_el in prod_price_elements:
+                                    if price_el.text is not None:
+                                        if any(char.isdigit() for char in price_el.text):
+                                            prod_price = price_el.text
+                                            prod_price = re.sub(r'([^a-zA-Z]\w+\%+)', '', prod_price)
+                                            break
+                                        else:
+                                            prod_price = '-1'
                             else:
-                                db_date = list(scraperwiki.sql.select('date FROM exisprodcache ORDER BY CAST(date AS INT) ASC LIMIT 1'))[0]
-                                db_date = datetime(year=int(db_date[0:4]),\
-                                                   month=int(db_date[4:6]),\
-                                                   day=int(db_date[6:8]),\
-                                                   hour=int(db_date[8:10]),\
-                                                   minute=int(db_date[10:12]),\
-                                                   second=int(db_date[12:14]))
-                                current_date = (datetime.utcnow() + timedelta(seconds=60*60))
-                                duration = (current_date - db_date).total_seconds()
-                                hour_diff = divmod(duration, 3600)[0]
-                                if (hour_diff > 24):
-                                    while jsonprodexists:
-                                        count = 1
-                                        while count <= jsonprodexists.len():
-                                            scraperwiki.sqlite.save(unique_keys=['count'],\
-                                                exisprodcache = {'count': ((count - 1) + doesprodexistoffset),\
-                                                'prodexcerpt': jsonprodexists[count],\
-                                                      'date': jsonprodexists[0]})
-                                            count = count + 1
-                                        doesprodexistoffset = doesprodexistoffset + limit
-                                        r = requests.get(wp_connectwp_url_6 + str(doesprodexistoffset) + '/' + str(limit) + '/', headers=headers)
-                                        jsonprodexists = json.loads(r.content)
-                            product_search_result = scraperwiki.sql.select('* FROM exisprodcache WHERE prodexcerpt REGEXP ' + scrapsite['scrapefield'] + '')   
-                            if product_search_result:
-                                print("Found product already existing, moving onto next product!");
-                                continue
-                        # >>> GET THE PRICE <<< #
-                        prod_price_elements = ''
-                        prod_price = ''
+                                prod_price = '-1'
+                        if re.search('Sold\s*Out', prod_price, flags=re.IGNORECASE):
+                            prod_price = '0 ' + scrapsite['scrapefield']['currencysymbol'] + ''
+                            prod_sold_out = True
+                        elif scrapsite['scrapefield']['productnocommaasdelimiter'] == '1':
+                            prod_price = prod_price.replace('\,', '', prod_price)
+                        #print('FINALPRICE:' + prod_price)
+                    except:
+                        print(traceback.format_exc())
+                    # >>> GET THE SALES PRICE <<< #
+                    prod_salesprice_elements = ''
+                    prod_salesprice = ''
+                    if scrapsite['scrapefield']['salespriceselector']:
                         try:
-                            scrapsite['scrapefield']['priceselector'] = scrapsite['scrapefield']['priceselector'].encode().decode("unicode-escape")
-                            #print(scrapsite['scrapefield']['priceselector'])
-                            if scrapsite['scrapefield']['priceselector'].find('[multiple],') != -1:
-                                scrapsite['scrapefield']['priceselector'].replace('[multiple],', '')
-                                prod_price_elements = root.cssselect(scrapsite['scrapefield']['priceselector'])
-                                for el in prod_price_elements:
-                                    if el is None:
-                                        continue
-                                    prod_price = prod_price + el.text + ' '
-                                if prod_price != '':
-                                    prod_price = re.sub(r'([^a-zA-Z]\w+\%+)', '', prod_price)
-                            else:
-                                prod_price_elements = root.cssselect(scrapsite['scrapefield']['priceselector'])
-                                if prod_price_elements:
-                                    for price_el in prod_price_elements:
-                                        if price_el.text is not None:
-                                            if any(char.isdigit() for char in price_el.text):
-                                                prod_price = price_el.text
-                                                prod_price = re.sub(r'([^a-zA-Z]\w+\%+)', '', prod_price)
-                                                break
-                                            else:
-                                                prod_price = '-1'
-                                else:
-                                    prod_price = '-1'
-                            if re.search('Sold\s*Out', prod_price, flags=re.IGNORECASE):
-                                prod_price = '0 ' + scrapsite['scrapefield']['currencysymbol'] + ''
-                                prod_sold_out = True
-                            elif scrapsite['scrapefield']['productnocommaasdelimiter'] == '1':
-                                prod_price = prod_price.replace('\,', '', prod_price)
-                            #print('FINALPRICE:' + prod_price)
-                        except:
-                            print(traceback.format_exc())
-                        # >>> GET THE SALES PRICE <<< #
-                        prod_salesprice_elements = ''
-                        prod_salesprice = ''
-                        if scrapsite['scrapefield']['salespriceselector']:
-                            try:
-                                scrapsite['scrapefield']['salespriceselector'] = scrapsite['scrapefield']['salespriceselector'].encode().decode("unicode-escape")
-                                prod_salesprice_elements = root.cssselect(scrapsite['scrapefield']['salespriceselector'])   
-                                if prod_salesprice_elements:
-                                    if any(char.isdigit() for char in prod_salesprice_elements[0].text):
-                                        prod_salesprice = prod_salesprice_elements[0].text
-                                        prod_salesprice = re.sub(r'([^a-zA-Z]\w+\%+)', '', prod_salesprice)
-                                    else:
-                                        prod_salesprice = '-1'
+                            scrapsite['scrapefield']['salespriceselector'] = scrapsite['scrapefield']['salespriceselector'].encode().decode("unicode-escape")
+                            prod_salesprice_elements = root.cssselect(scrapsite['scrapefield']['salespriceselector'])   
+                            if prod_salesprice_elements:
+                                if any(char.isdigit() for char in prod_salesprice_elements[0].text):
+                                    prod_salesprice = prod_salesprice_elements[0].text
+                                    prod_salesprice = re.sub(r'([^a-zA-Z]\w+\%+)', '', prod_salesprice)
                                 else:
                                     prod_salesprice = '-1'
-                                if re.search('Sold\s*Out', prod_salesprice, flags=re.IGNORECASE):
-                                    prod_salesprice = '0 ' + scrapsite['scrapefield']['currencysymbol'] + ''
-                                    prod_sold_out = True
-                                elif scrapsite['scrapefield']['productnocommaasdelimiter'] == '1':
-                                    prod_salesprice = prod_salesprice.replace('\,', '', prod_salesprice)
-                            except:
-                                print(traceback.format_exc())
-                        # >>> CHECK IF BRAND IS FOUND IN NAME <<< #
-                        prod_brand = ''
-                        try:
-                            brand_terms = jsonprodattr['pa_brand']
-                            for brandterm in brand_terms:
-                                brandus = brandterm['name'].lower()
-                                titlus = prod_title.lower()
-                                if re.search(r'' + brandus + '', titlus) is not None:
-                                    prod_brand = brandterm['name']
-                                    break
+                            else:
+                                prod_salesprice = '-1'
+                            if re.search('Sold\s*Out', prod_salesprice, flags=re.IGNORECASE):
+                                prod_salesprice = '0 ' + scrapsite['scrapefield']['currencysymbol'] + ''
+                                prod_sold_out = True
+                            elif scrapsite['scrapefield']['productnocommaasdelimiter'] == '1':
+                                prod_salesprice = prod_salesprice.replace('\,', '', prod_salesprice)
                         except:
-                            print(traceback.format_exc())            
-                        # >>> CHECK IF DOMAIN NAME SHOULD BE USED AS PROD. BRAND <<< #
-                        if scrapsite['scrapefield']['domainname']:
-                            try:
-                                if prod_brand != '':
-                                    prod_brand = scrapsite['scrapefield']['domainname']
-                            except:
-                                print(traceback.format_exc())
-                        # >>> GET THE DOMAIN MISC. ELEMENTS <<< #
-                        domainmisc_array = ''
-                        # --> Define containers for product attributes
-                        prod_colors = ''
-                        prod_sizes = ''
-                        prod_categories = ''
-                        # --> Define values that will be saved to database once done:
-                        sizetypemisc = ''
-                        preexistingcurrency = ''
-                        altimggrab = ''
-                        ignoreurlscontainingstring = ''
-                        femaletruemalefalse = ''
-                        soldout = False
-                        scrapedmiscitems = ''
-                        # --> Get 'em!
-                        if scrapsite['scrapefield']['domainmisc']:
-                            try:
-                                domainmisc_array = re.split('{|}', scrapsite['scrapefield']['domainmisc'])
-                                for i in range(2, len(domainmisc_array), 2):
-                                    #domainmisc_array[i] = prod_root.cssselect(domainmisc_array[i])
-                                    # --- Are the sizes belonging to the current product of a a specific misc. size type? --- #
-                                    if domainmisc_array[(i-1)] == 'sizetypemisc':
-                                        sizetypemisc = domainmisc_array[i]
-                                    # --- Are there any pre-existing currencies to apply to the price(s)? --- #
-                                    if domainmisc_array[(i-1)] == 'pre_existing_currency':
-                                        preexistingcurrency = domainmisc_array[i]
-                                        prod_price = prod_price + domainmisc_array[i].strip()
-                                        if prod_salesprice != '':
-                                            prod_salesprice = prod_salesprice + domainmisc_array[i].strip()
-                                    # --- Any alternative ways to utilize for grabbing image urls? --- #
-                                    if domainmisc_array[(i-1)] == 'alt_img_grab':
-                                        altimggrab = '1'
-                                    if domainmisc_array[(i-1)] == 'alt_img_grab_2':
-                                        altimggrab = '2'
-                                    # --- Should the product skip any URLs(Product logo and normal IMGs) containing any specific string(s)? --- #
-                                    if domainmisc_array[(i-1)] == 'skip_img_containing':
-                                        ignoreurlscontainingstring = domainmisc_array[i]
-                                    # --- Should the product apply a specific category automatically? --- #
-                                    if domainmisc_array[(i-1)] == 'add_category':
-                                       prod_categories = ','.split(domainmisc_array[i])
-                                    # --- Should the product apply the male/female attribute automatically? --- #
-                                    if productmisc_array[(i-1)] == 'is_male':
-                                        femaletruemalefalse = 'M'
-                                    elif productmisc_array[(i-1)] == 'is_female':
-                                        femaletruemalefalse = 'F'
-                                    # --> Attempt scraping of product misc. elements:
-                                    domainmisc_array[i] = prod_root.cssselect(domainmisc_array[i].strip().encode().decode("unicode-escape"))
-                                    if domainmisc_array[i]:
-                                        # --- Has the product got any special sale price applied? --- #
-                                        if productmisc_array[(i-1)] == 'before_sale_price':
-                                            if len(productmisc_array[i]) > 0:
-                                                newprice = productmisc_array[i][0].text
-                                                prod_salesprice = prod_price
-                                                prod_price = newprice
-                                                if preexistingcurrency != '':
-                                                    prod_price = prod_price + preexistingcurrency.strip()
-                                        # --- Apply brand, color, category and size
-                                        if productmisc_array[(i-1)] == 'pa_brand':
-                                            if len(productmisc_array[i]) > 0:
-                                                prod_brand = productmisc_array[i][0].text
-                                        if productmisc_array[(i-1)] == 'pa_color':
-                                            if len(productmisc_array[i]) > 0:
-                                                count = 0
-                                                for el in productmisc_array[i]:  
-                                                    prod_colors.append(productmisc_array[i][count].text)
-                                                    count = count + 1
-                                        if productmisc_array[(i-1)] == 'pa_category':
-                                            if len(productmisc_array[i]) > 0:
-                                                prodcat_array = []
-                                                count = 0
-                                                for el in productmisc_array[i]:  
-                                                    prodcat_array.append(productmisc_array[i][count].text)
-                                                    count = count + 1
-                                                if prod_categories != '':
-                                                    prod_categories = [prod_categories, prodcat_array]
-                                                else:
-                                                    prod_categories = prodcat_array
-                                        if productmisc_array[(i-1)] == 'pa_size':
-                                            if len(productmisc_array[i]) > 0:
-                                                count = 0
-                                                for el in productmisc_array[i]:  
-                                                    prod_sizes.append(productmisc_array[i][count].text)
-                                                    count = count + 1
-                                        # --- Should we skip the first size alternative on information import? --- #
-                                        if productmisc_array[(i-1)] == 'skip_first_size':
-                                            if prod_sizes != '':
-                                                removed_size = prod_sizes.pop(0)
-                                        # --- Has the product sold out yet? --- #
-                                        if productmisc_array[(i-1)] == 'sold_out':
-                                            if len(productmisc_array[i]) > 0:
-                                                soldout = True
-                                scrapedmiscitems = json.dumps(productmisc_array)
-                                #print('DOMAINMISC:')
-                                #for d in domainmisc_array: print d
-                            except:
-                                print(traceback.format_exc())
-                        # >>> GET THE PRODUCT LOGO URL(S) - IF SUCH EXISTS <<< #
-                        prodlog_image_urls = ''
-                        productlogourls = ''
-                        if scrapsite['scrapefield']['productlogoselector']:
-                            try:
-                                scrapsite['scrapefield']['productlogoselector'] = scrapsite['scrapefield']['productlogoselector'].encode().decode("unicode-escape")
-                                prodlog_image_elements = prod_root.cssselect(scrapsite['scrapefield']['productlogoselector'])
-                                if prodlog_image_elements:
-                                    for i in range(len(prodlog_image_elements)):
-                                        prodlog_image_elements[i] = etree.tostring(prodlog_image_elements[i])
-                                    image_dom = ','.join(prodlog_image_elements)
-                                    if altimggrab == '1':
-                                        output = re.search(r'image\=\"(.*)\"', image_dom, flags.U)
-                                        if output.len() > 0:
-                                            removed_top_element = output.pop(0)
-                                            prodlog_image_urls = output
-                                    elif altimggrab == '2':
-                                        output = re.search(r'src\=\"(.*)\"', image_dom, flags.U)
-                                        if output.len() > 0:
-                                            removed_top_element = output.pop(0)
-                                            prodlog_image_urls = output
-                                    else:
-                                        prodlog_image_urls = graburls(image_dom, True)
-                                    if len(prodlog_image_urls) > 0:
-                                        for imagekey, imageval in prodlog_image_urls.copy().items():
-                                            newimageval = urljoin(product['url'], imageval)
-                                            if imageval != newimageval:
-                                                prodlog_image_urls[imagekey] = newimageval
-                                                imageval = newimageval
-                                            if image.find('//') == -1:
-                                                del prodlog_image_urls[imagekey]
-                                                continue
-                                            if image.find('blank.'):
-                                                del prodlog_image_urls[imagekey]
-                                                continue
-                                            if imageval[0:2] == '//':
-                                                imageval = 'https:' + imageval
-                                                prodlog_image_urls[imagekey] = imageval
-                                    productlogourls = prodlog_image_urls
+                            print(traceback.format_exc())
+                    # >>> CHECK IF BRAND IS FOUND IN NAME <<< #
+                    prod_brand = ''
+                    try:
+                        brand_terms = jsonprodattr['pa_brand']
+                        for brandterm in brand_terms:
+                            brandus = brandterm['name'].lower()
+                            titlus = prod_title.lower()
+                            if re.search(r'' + brandus + '', titlus) is not None:
+                                prod_brand = brandterm['name']
+                                break
+                    except:
+                        print(traceback.format_exc())            
+                    # >>> CHECK IF DOMAIN NAME SHOULD BE USED AS PROD. BRAND <<< #
+                    if scrapsite['scrapefield']['domainname']:
+                        try:
+                            if prod_brand != '':
+                                prod_brand = scrapsite['scrapefield']['domainname']
+                        except:
+                            print(traceback.format_exc())
+                    # >>> GET THE DOMAIN MISC. ELEMENTS <<< #
+                    domainmisc_array = ''
+                    # --> Define containers for product attributes
+                    prod_colors = ''
+                    prod_sizes = ''
+                    prod_categories = ''
+                    # --> Define values that will be saved to database once done:
+                    sizetypemisc = ''
+                    preexistingcurrency = ''
+                    altimggrab = ''
+                    ignoreurlscontainingstring = ''
+                    femaletruemalefalse = ''
+                    soldout = False
+                    scrapedmiscitems = ''
+                    # --> Get 'em!
+                    if scrapsite['scrapefield']['domainmisc']:
+                        try:
+                            domainmisc_array = re.split('{|}', scrapsite['scrapefield']['domainmisc'])
+                            for i in range(2, len(domainmisc_array), 2):
+                                #domainmisc_array[i] = prod_root.cssselect(domainmisc_array[i])
+                                # --- Are the sizes belonging to the current product of a a specific misc. size type? --- #
+                                if domainmisc_array[(i-1)] == 'sizetypemisc':
+                                    sizetypemisc = domainmisc_array[i]
+                                # --- Are there any pre-existing currencies to apply to the price(s)? --- #
+                                if domainmisc_array[(i-1)] == 'pre_existing_currency':
+                                    preexistingcurrency = domainmisc_array[i]
+                                    prod_price = prod_price + domainmisc_array[i].strip()
+                                    if prod_salesprice != '':
+                                        prod_salesprice = prod_salesprice + domainmisc_array[i].strip()
+                                # --- Any alternative ways to utilize for grabbing image urls? --- #
+                                if domainmisc_array[(i-1)] == 'alt_img_grab':
+                                    altimggrab = '1'
+                                if domainmisc_array[(i-1)] == 'alt_img_grab_2':
+                                    altimggrab = '2'
+                                # --- Should the product skip any URLs(Product logo and normal IMGs) containing any specific string(s)? --- #
+                                if domainmisc_array[(i-1)] == 'skip_img_containing':
+                                    ignoreurlscontainingstring = domainmisc_array[i]
+                                # --- Should the product apply a specific category automatically? --- #
+                                if domainmisc_array[(i-1)] == 'add_category':
+                                   prod_categories = ','.split(domainmisc_array[i])
+                                # --- Should the product apply the male/female attribute automatically? --- #
+                                if productmisc_array[(i-1)] == 'is_male':
+                                    femaletruemalefalse = 'M'
+                                elif productmisc_array[(i-1)] == 'is_female':
+                                    femaletruemalefalse = 'F'
+                                # --> Attempt scraping of product misc. elements:
+                                domainmisc_array[i] = prod_root.cssselect(domainmisc_array[i].strip().encode().decode("unicode-escape"))
+                                if domainmisc_array[i]:
+                                    # --- Has the product got any special sale price applied? --- #
+                                    if productmisc_array[(i-1)] == 'before_sale_price':
+                                        if len(productmisc_array[i]) > 0:
+                                            newprice = productmisc_array[i][0].text
+                                            prod_salesprice = prod_price
+                                            prod_price = newprice
+                                            if preexistingcurrency != '':
+                                                prod_price = prod_price + preexistingcurrency.strip()
+                                    # --- Apply brand, color, category and size
+                                    if productmisc_array[(i-1)] == 'pa_brand':
+                                        if len(productmisc_array[i]) > 0:
+                                            prod_brand = productmisc_array[i][0].text
+                                    if productmisc_array[(i-1)] == 'pa_color':
+                                        if len(productmisc_array[i]) > 0:
+                                            count = 0
+                                            for el in productmisc_array[i]:  
+                                                prod_colors.append(productmisc_array[i][count].text)
+                                                count = count + 1
+                                    if productmisc_array[(i-1)] == 'pa_category':
+                                        if len(productmisc_array[i]) > 0:
+                                            prodcat_array = []
+                                            count = 0
+                                            for el in productmisc_array[i]:  
+                                                prodcat_array.append(productmisc_array[i][count].text)
+                                                count = count + 1
+                                            if prod_categories != '':
+                                                prod_categories = [prod_categories, prodcat_array]
+                                            else:
+                                                prod_categories = prodcat_array
+                                    if productmisc_array[(i-1)] == 'pa_size':
+                                        if len(productmisc_array[i]) > 0:
+                                            count = 0
+                                            for el in productmisc_array[i]:  
+                                                prod_sizes.append(productmisc_array[i][count].text)
+                                                count = count + 1
+                                    # --- Should we skip the first size alternative on information import? --- #
+                                    if productmisc_array[(i-1)] == 'skip_first_size':
+                                        if prod_sizes != '':
+                                            removed_size = prod_sizes.pop(0)
+                                    # --- Has the product sold out yet? --- #
+                                    if productmisc_array[(i-1)] == 'sold_out':
+                                        if len(productmisc_array[i]) > 0:
+                                            soldout = True
+                            scrapedmiscitems = json.dumps(productmisc_array)
+                            #print('DOMAINMISC:')
+                            #for d in domainmisc_array: print d
+                        except:
+                            print(traceback.format_exc())
+                    # >>> GET THE PRODUCT LOGO URL(S) - IF SUCH EXISTS <<< #
+                    prodlog_image_urls = ''
+                    productlogourls = ''
+                    if scrapsite['scrapefield']['productlogoselector']:
+                        try:
+                            scrapsite['scrapefield']['productlogoselector'] = scrapsite['scrapefield']['productlogoselector'].encode().decode("unicode-escape")
+                            prodlog_image_elements = prod_root.cssselect(scrapsite['scrapefield']['productlogoselector'])
+                            if prodlog_image_elements:
+                                for i in range(len(prodlog_image_elements)):
+                                    prodlog_image_elements[i] = etree.tostring(prodlog_image_elements[i])
+                                image_dom = ','.join(prodlog_image_elements)
+                                if altimggrab == '1':
+                                    output = re.search(r'image\=\"(.*)\"', image_dom, flags.U)
+                                    if output.len() > 0:
+                                        removed_top_element = output.pop(0)
+                                        prodlog_image_urls = output
+                                elif altimggrab == '2':
+                                    output = re.search(r'src\=\"(.*)\"', image_dom, flags.U)
+                                    if output.len() > 0:
+                                        removed_top_element = output.pop(0)
+                                        prodlog_image_urls = output
                                 else:
-                                    print("No product logo URLs could be found for product ID " + product['productid'] + "!")
-                                #print('PRODUCTLOGOS:')
-                                #for p in prodlog_image_urls: print(p)
-                                #print('PRODUCTLOGOURL:' + productlogourl)
-                            except:
-                                print(traceback.format_exc())
-                        # >>> GET THE IMAGE URL(S) <<< #
-                        image_urls = ''
-                        image_elements = ''
-                        image_urls_valid = ''
-                        images = ''
-                        if scrapsite['scrapefield']['imageselector'] and len(scrapsite['scrapefield']['imageselector']):
-                            try:
-                                scrapsite['scrapefield']['imageselector'] = scrapsite['scrapefield']['imageselector'].encode().decode("unicode-escape")
-                                #image_urls = ''
-                                image_elements = root.cssselect(scrapsite['scrapefield']['imageselector'])
-                                if image_elements:
-                                    for i in range(len(image_elements)):
-                                        image_elements[i] = str(etree.tostring(image_elements[i]))
-                                    image_dom = ','.join(image_elements)
-                                    #print('IMAGE DOM: ' + image_dom)
-                                    if altimggrab == '1':
-                                        output = re.finditer(r'image\=\"(.*)\"', image_dom, flags.U)
-                                        if output[1].len() > 0:
-                                            #removed_top_element = output.pop(0)
-                                            image_urls = output[1]
-                                    elif altimggrab == '2':
-                                        output = re.search(r'src\=\"(.*)\"', image_dom, flags.U)
-                                        if output.len() > 0:
-                                            removed_top_element = output.pop(0)
-                                            image_urls = output
-                                    else:
-                                        image_urls = graburls(image_dom, True)
-                                    #print('PRE-IMAGE URLS: ')
-                                    #for img in image_urls: print(img)
-                                if len(image_urls) > 0:
-                                    for imagekey, imageval in image_urls.copy().items():
+                                    prodlog_image_urls = graburls(image_dom, True)
+                                if len(prodlog_image_urls) > 0:
+                                    for imagekey, imageval in prodlog_image_urls.copy().items():
                                         newimageval = urljoin(product['url'], imageval)
                                         if imageval != newimageval:
-                                            image_urls[imagekey] = newimageval
+                                            prodlog_image_urls[imagekey] = newimageval
                                             imageval = newimageval
                                         if image.find('//') == -1:
-                                                del prodlog_image_urls[imagekey]
-                                                continue
-                                        if image.find('blank.'):
                                             del prodlog_image_urls[imagekey]
                                             continue
-                                        if image.find(ignoreurlscontainingstring):
+                                        if image.find('blank.'):
                                             del prodlog_image_urls[imagekey]
                                             continue
                                         if imageval[0:2] == '//':
                                             imageval = 'https:' + imageval
-                                            image_urls[imagekey] = imageval
-                                    image_urls_valid = list(image_urls.values())
-                                #print('IMAGE ELEMENTS:')
-                                #for img in image_elements: print img
-                                #print('IMAGE URLS:')
-                                #for img in image_urls: print img
-                                #print('VALID IMAGES:')
-                                #for img in image_urls_valid: print img
-                            except:
-                                #print("Error when scraping images for product ID " + product['productid'] + ": " + sys.exc_info()[0] + " occured!")
-                                print(traceback.format_exc())
-                        #MAYBE GET NEWDOMAIN HERE?
-                        scraperwiki.sqlite.save(unique_keys=['scrapeurl'],\
-                                                prodstocreate={'domain': scrapsite['scrapefield']['domain'],\
-                                                      'scrapeurl': scrapsite['scrapeurl'],\
-                                                      'producturl': prod_url,\
-                                                      'currencysymbol': scrapsite['scrapefield']['currencysymbol'],\
-                                                      'title': prod_title,\
-                                                      'price': prod_price,\
-                                                      'salesprice': prod_salesprice,\
-                                                      'brand': prod_brand,\
-                                                      'color': json.dumps(prod_colors),\
-                                                      'size': json.dumps(prod_sizes),\
-                                                      'sizetypemisc': sizetypemisc,\
-                                                      'category': json.dumps(prod_categories),\
-                                                      'sex': femaletruemalefalse,\
-                                                      'soldout': soldout,\
-                                                      'imageurls': json.dumps(image_urls_valid),\
-                                                      'logoimageurls': json.dumps(productlogourls),\
-                                                      'miscdetails': scrapedmiscitems})        
-            else:
-                continue
+                                            prodlog_image_urls[imagekey] = imageval
+                                productlogourls = prodlog_image_urls
+                            else:
+                                print("No product logo URLs could be found for product ID " + product['productid'] + "!")
+                            #print('PRODUCTLOGOS:')
+                            #for p in prodlog_image_urls: print(p)
+                            #print('PRODUCTLOGOURL:' + productlogourl)
+                        except:
+                            print(traceback.format_exc())
+                    # >>> GET THE IMAGE URL(S) <<< #
+                    image_urls = ''
+                    image_elements = ''
+                    image_urls_valid = ''
+                    images = ''
+                    if scrapsite['scrapefield']['imageselector'] and len(scrapsite['scrapefield']['imageselector']):
+                        try:
+                            scrapsite['scrapefield']['imageselector'] = scrapsite['scrapefield']['imageselector'].encode().decode("unicode-escape")
+                            #image_urls = ''
+                            image_elements = root.cssselect(scrapsite['scrapefield']['imageselector'])
+                            if image_elements:
+                                for i in range(len(image_elements)):
+                                    image_elements[i] = str(etree.tostring(image_elements[i]))
+                                image_dom = ','.join(image_elements)
+                                #print('IMAGE DOM: ' + image_dom)
+                                if altimggrab == '1':
+                                    output = re.finditer(r'image\=\"(.*)\"', image_dom, flags.U)
+                                    if output[1].len() > 0:
+                                        #removed_top_element = output.pop(0)
+                                        image_urls = output[1]
+                                elif altimggrab == '2':
+                                    output = re.search(r'src\=\"(.*)\"', image_dom, flags.U)
+                                    if output.len() > 0:
+                                        removed_top_element = output.pop(0)
+                                        image_urls = output
+                                else:
+                                    image_urls = graburls(image_dom, True)
+                                #print('PRE-IMAGE URLS: ')
+                                #for img in image_urls: print(img)
+                            if len(image_urls) > 0:
+                                for imagekey, imageval in image_urls.copy().items():
+                                    newimageval = urljoin(product['url'], imageval)
+                                    if imageval != newimageval:
+                                        image_urls[imagekey] = newimageval
+                                        imageval = newimageval
+                                    if image.find('//') == -1:
+                                            del prodlog_image_urls[imagekey]
+                                            continue
+                                    if image.find('blank.'):
+                                        del prodlog_image_urls[imagekey]
+                                        continue
+                                    if image.find(ignoreurlscontainingstring):
+                                        del prodlog_image_urls[imagekey]
+                                        continue
+                                    if imageval[0:2] == '//':
+                                        imageval = 'https:' + imageval
+                                        image_urls[imagekey] = imageval
+                                image_urls_valid = list(image_urls.values())
+                            #print('IMAGE ELEMENTS:')
+                            #for img in image_elements: print img
+                            #print('IMAGE URLS:')
+                            #for img in image_urls: print img
+                            #print('VALID IMAGES:')
+                            #for img in image_urls_valid: print img
+                        except:
+                            #print("Error when scraping images for product ID " + product['productid'] + ": " + sys.exc_info()[0] + " occured!")
+                            print(traceback.format_exc())
+                    #MAYBE GET NEWDOMAIN HERE?
+                    scraperwiki.sqlite.save(unique_keys=['scrapeurl'],\
+                                            prodstocreate={'domain': scrapsite['scrapefield']['domain'],\
+                                                  'scrapeurl': scrapsite['scrapeurl'],\
+                                                  'producturl': prod_url,\
+                                                  'currencysymbol': scrapsite['scrapefield']['currencysymbol'],\
+                                                  'title': prod_title,\
+                                                  'price': prod_price,\
+                                                  'salesprice': prod_salesprice,\
+                                                  'brand': prod_brand,\
+                                                  'color': json.dumps(prod_colors),\
+                                                  'size': json.dumps(prod_sizes),\
+                                                  'sizetypemisc': sizetypemisc,\
+                                                  'category': json.dumps(prod_categories),\
+                                                  'sex': femaletruemalefalse,\
+                                                  'soldout': soldout,\
+                                                  'imageurls': json.dumps(image_urls_valid),\
+                                                  'logoimageurls': json.dumps(productlogourls),\
+                                                  'miscdetails': scrapedmiscitems})        
         else:
             continue
-    offset = offset + limit
-    r = requests.get(wp_connectwp_url + str(offset) + '/' + str(limit) + '/', headers=headers)
-    jsonscrapsites = r.json()
+    else:
+        continue
+#offset = offset + limit
+#r = requests.get(wp_connectwp_url + str(offset) + '/' + str(limit) + '/', headers=headers)
+#jsonscrapsites = r.json()

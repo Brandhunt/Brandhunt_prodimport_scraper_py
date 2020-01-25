@@ -547,57 +547,57 @@ for scrapsite in jsonscrapsites:
                                 if domainmisc_array[(i-1)] == 'add_category':
                                    prod_categories = ','.split(domainmisc_array[i])
                                 # --- Should the product apply the male/female attribute automatically? --- #
-                                if productmisc_array[(i-1)] == 'is_male':
+                                if domainmisc_array[(i-1)] == 'is_male':
                                     femaletruemalefalse = 'M'
-                                elif productmisc_array[(i-1)] == 'is_female':
+                                elif domainmisc_array[(i-1)] == 'is_female':
                                     femaletruemalefalse = 'F'
                                 # --> Attempt scraping of product misc. elements:
                                 domainmisc_array[i] = prod_root.cssselect(domainmisc_array[i].strip().encode().decode("unicode-escape"))
                                 if domainmisc_array[i]:
                                     # --- Has the product got any special sale price applied? --- #
-                                    if productmisc_array[(i-1)] == 'before_sale_price':
-                                        if len(productmisc_array[i]) > 0:
-                                            newprice = productmisc_array[i][0].text
+                                    if domainmisc_array[(i-1)] == 'before_sale_price':
+                                        if len(domainmisc_array[i]) > 0:
+                                            newprice = domainmisc_array[i][0].text
                                             prod_salesprice = prod_price
                                             prod_price = newprice
                                             if preexistingcurrency != '':
                                                 prod_price = prod_price + preexistingcurrency.strip()
                                     # --- Apply brand, color, category and size
-                                    if productmisc_array[(i-1)] == 'pa_brand':
-                                        if len(productmisc_array[i]) > 0:
-                                            prod_brand = productmisc_array[i][0].text
-                                    if productmisc_array[(i-1)] == 'pa_color':
-                                        if len(productmisc_array[i]) > 0:
+                                    if domainmisc_array[(i-1)] == 'pa_brand':
+                                        if len(domainmisc_array[i]) > 0:
+                                            prod_brand = domainmisc_array[i][0].text
+                                    if domainmisc_array[(i-1)] == 'pa_color':
+                                        if len(domainmisc_array[i]) > 0:
                                             count = 0
-                                            for el in productmisc_array[i]:  
-                                                prod_colors.append(productmisc_array[i][count].text)
+                                            for el in domainmisc_array[i]:  
+                                                prod_colors.append(domainmisc_array[i][count].text)
                                                 count = count + 1
-                                    if productmisc_array[(i-1)] == 'pa_category':
-                                        if len(productmisc_array[i]) > 0:
+                                    if domainmisc_array[(i-1)] == 'pa_category':
+                                        if len(domainmisc_array[i]) > 0:
                                             prodcat_array = []
                                             count = 0
-                                            for el in productmisc_array[i]:  
-                                                prodcat_array.append(productmisc_array[i][count].text)
+                                            for el in domainmisc_array[i]:  
+                                                prodcat_array.append(domainmisc_array[i][count].text)
                                                 count = count + 1
                                             if prod_categories != '':
                                                 prod_categories = [prod_categories, prodcat_array]
                                             else:
                                                 prod_categories = prodcat_array
-                                    if productmisc_array[(i-1)] == 'pa_size':
-                                        if len(productmisc_array[i]) > 0:
+                                    if domainmisc_array[(i-1)] == 'pa_size':
+                                        if len(domainmisc_array[i]) > 0:
                                             count = 0
-                                            for el in productmisc_array[i]:  
-                                                prod_sizes.append(productmisc_array[i][count].text)
+                                            for el in domainmisc_array[i]:  
+                                                prod_sizes.append(domainmisc_array[i][count].text)
                                                 count = count + 1
                                     # --- Should we skip the first size alternative on information import? --- #
-                                    if productmisc_array[(i-1)] == 'skip_first_size':
+                                    if domainmisc_array[(i-1)] == 'skip_first_size':
                                         if prod_sizes != '':
                                             removed_size = prod_sizes.pop(0)
                                     # --- Has the product sold out yet? --- #
-                                    if productmisc_array[(i-1)] == 'sold_out':
-                                        if len(productmisc_array[i]) > 0:
+                                    if domainmisc_array[(i-1)] == 'sold_out':
+                                        if len(domainmisc_array[i]) > 0:
                                             soldout = True
-                            scrapedmiscitems = json.dumps(productmisc_array)
+                            scrapedmiscitems = json.dumps(domainmisc_array)
                             #print('DOMAINMISC:')
                             #for d in domainmisc_array: print d
                         except:

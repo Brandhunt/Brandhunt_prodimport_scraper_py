@@ -248,7 +248,6 @@ for scrapsite in jsonscrapsites:
             else:
                 raise
         except:
-            #print("Error when scraping URL for product ID " + product['productid'] + ": " + str(sys.exc_info()[0]) + " occured!")
             print(traceback.format_exc())
             #HAPP
         # >>> GET THE HTML ROOT <<< #
@@ -627,7 +626,7 @@ for scrapsite in jsonscrapsites:
                                     prodlog_image_urls = graburls(image_dom, True)
                                 if len(prodlog_image_urls) > 0:
                                     for imagekey, imageval in prodlog_image_urls.copy().items():
-                                        newimageval = urljoin(product['url'], imageval)
+                                        newimageval = urljoin(scrapsite['scrapeurl'], imageval)
                                         if imageval != newimageval:
                                             prodlog_image_urls[imagekey] = newimageval
                                             imageval = newimageval
@@ -642,7 +641,7 @@ for scrapsite in jsonscrapsites:
                                             prodlog_image_urls[imagekey] = imageval
                                 productlogourls = prodlog_image_urls
                             else:
-                                print("No product logo URLs could be found for product ID " + product['productid'] + "!")
+                                print("No product logo URLs could be found for product with title " + prod_title + "!")
                             #print('PRODUCTLOGOS:')
                             #for p in prodlog_image_urls: print(p)
                             #print('PRODUCTLOGOURL:' + productlogourl)
@@ -679,7 +678,7 @@ for scrapsite in jsonscrapsites:
                                 #for img in image_urls: print(img)
                             if len(image_urls) > 0:
                                 for imagekey, imageval in image_urls.copy().items():
-                                    newimageval = urljoin(product['url'], imageval)
+                                    newimageval = urljoin(scrapsite['scrapeurl'], imageval)
                                     if imageval != newimageval:
                                         image_urls[imagekey] = newimageval
                                         imageval = newimageval
@@ -703,7 +702,6 @@ for scrapsite in jsonscrapsites:
                             #print('VALID IMAGES:')
                             #for img in image_urls_valid: print img
                         except:
-                            #print("Error when scraping images for product ID " + product['productid'] + ": " + sys.exc_info()[0] + " occured!")
                             print(traceback.format_exc())
                     #MAYBE GET NEWDOMAIN HERE?
                     scraperwiki.sqlite.save(unique_keys=['scrapeurl'],\

@@ -191,7 +191,7 @@ jsonprodexists = json.loads(r.content)
 
 while jsonscrapsites:
     for scrapsite in jsonscrapsites:
-        print(scrapsite)
+        print(json.dumps(scrapsite))
         # --> Ignore current product import URL if neccessary!
         if scrapsite['scrapefield']['productignorethisone'] == '1':
             continue

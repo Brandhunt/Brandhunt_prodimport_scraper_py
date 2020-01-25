@@ -704,7 +704,7 @@ for scrapsite in jsonscrapsites:
                         except:
                             print(traceback.format_exc())
                     #MAYBE GET NEWDOMAIN HERE?
-                    scraperwiki.sqlite.save(unique_keys=['scrapeurl'],\
+                    scraperwiki.sqlite.save(unique_keys=['producturl'],\
                                             data={'domain': scrapsite['scrapefield']['domain'],\
                                                   'scrapeurl': scrapsite['scrapeurl'],\
                                                   'producturl': prod_url,\

@@ -170,6 +170,7 @@ doesprodexistoffset = int(os.environ['MORPH_PRODCHECK_OFFSET'])
 limit = 25
 
 r = requests.get(wp_connectwp_url + str(offset) + '/' + str(limit) + '/', headers=headers)
+print(wp_connectwp_url + str(offset) + '/' + str(limit) + '/')
 jsonscrapsites = json.loads(r.content)
 
 #r = requests.get(wp_connectwp_url_2, headers=headers)

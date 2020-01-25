@@ -344,7 +344,7 @@ for scrapsite in jsonscrapsites:
                         scrapsite['scrapefield']['urlselector'] = scrapsite['scrapefield']['urlselector'].encode().decode("unicode-escape")
                         product_urL_element = prod_root.cssselect(scrapsite['scrapefield']['urlselector'])[0]
                         if product_urL_element is not None:
-                            prod_url_html = etree.tostring(product_urL_element)
+                            prod_url_html = str(etree.tostring(product_urL_element))
                             matches = re.search(r'https?:\/\/(?![^" ]*(?:gif|jpg|jpeg|png|svg))[^" ]+', prod_url_html)
                             if matches:
                                 prod_url = matches[0]

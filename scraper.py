@@ -575,10 +575,10 @@ while jsonscrapsites:
                                         if productmisc_array[(i-1)] == 'pa_category':
                                             if len(productmisc_array[i]) > 0:
                                                 prodcat_array = []
-                                                    count = 0
-                                                    for el in productmisc_array[i]:  
-                                                        prodcat_array.append(productmisc_array[i][count].text)
-                                                        count = count + 1
+                                                count = 0
+                                                for el in productmisc_array[i]:  
+                                                    prodcat_array.append(productmisc_array[i][count].text)
+                                                    count = count + 1
                                                 if prod_categories != '':
                                                     prod_categories = [prod_categories, prodcat_array]
                                                 else:

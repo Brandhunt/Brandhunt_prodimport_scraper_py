@@ -686,10 +686,10 @@ for scrapsite in jsonscrapsites:
                                             del prodlog_image_urls[imagekey]
                                             continue
                                     if imageval.find('blank.'):
-                                        del prodlog_image_urls[imagekey]
+                                        del image_urls[imagekey]
                                         continue
                                     if imageval.find(ignoreurlscontainingstring):
-                                        del prodlog_image_urls[imagekey]
+                                        del image_urls[imagekey]
                                         continue
                                     if imageval[0:2] == '//':
                                         imageval = 'https:' + imageval

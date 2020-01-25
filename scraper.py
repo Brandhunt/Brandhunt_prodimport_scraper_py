@@ -189,6 +189,7 @@ jsonprodexists = json.loads(r.content)
 
 # --> Decode and handle these product import URLs!
 while jsonscrapsites:
+    print(json.dumps(jsonscrapsites))
     for scrapsite in jsonscrapsites:
         print(json.dumps(scrapsite))
         # --> Ignore current product import URL if neccessary!

@@ -501,7 +501,7 @@ for scrapsite in jsonscrapsites:
                     # >>> CHECK IF DOMAIN NAME SHOULD BE USED AS PROD. BRAND <<< #
                     if scrapsite['scrapefield']['domainname']:
                         try:
-                            if prod_brand != '':
+                            if prod_brand == '':
                                 prod_brand = scrapsite['scrapefield']['domainname']
                         except:
                             print(traceback.format_exc())

@@ -706,7 +706,7 @@ for scrapsite in jsonscrapsites:
                                         array_output.append(output_el.group(1))
                                     if len(array_output) > 0:
                                         #removed_top_element = output.pop(0)
-                                        image_urls = array_output
+                                        image_urls = { i : array_output[i] for i in range(0, len(array_output)) }
                                 elif altimggrab == '2':
                                     #output = re.search(r'src\=\"(.*)\"', image_dom, flags=re.U)
                                     output = re.search(r'src\=\"(.*?)\"', image_dom)

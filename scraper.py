@@ -680,7 +680,7 @@ for scrapsite in jsonscrapsites:
                                     array_output = []
                                     for output_el in output:
                                         array_output.append(output_el.group())
-                                    if array_output.len() > 1:
+                                    if len(array_output) > 1:
                                         if array_output[1].len() > 0:
                                             #removed_top_element = output.pop(0)
                                             image_urls = array_output[1]

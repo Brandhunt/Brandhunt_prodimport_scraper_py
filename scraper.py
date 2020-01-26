@@ -475,7 +475,7 @@ for scrapsite in jsonscrapsites:
                             prod_price = '0 ' + scrapsite['scrapefield']['currencysymbol'] + ''
                             prod_sold_out = True
                         elif scrapsite['scrapefield']['productnocommaasdelimiter'] == '1':
-                            prod_price = prod_price.replace('\,', '', prod_price)
+                            prod_price = prod_price.replace('\,', '')
                         #print('FINALPRICE:' + prod_price)
                     except:
                         print(traceback.format_exc())
@@ -498,7 +498,7 @@ for scrapsite in jsonscrapsites:
                                 prod_salesprice = '0 ' + scrapsite['scrapefield']['currencysymbol'] + ''
                                 prod_sold_out = True
                             elif scrapsite['scrapefield']['productnocommaasdelimiter'] == '1':
-                                prod_salesprice = prod_salesprice.replace('\,', '', prod_salesprice)
+                                prod_salesprice = prod_salesprice.replace('\,', '')
                         except:
                             print(traceback.format_exc())
                     # >>> CHECK IF BRAND IS FOUND IN NAME <<< #

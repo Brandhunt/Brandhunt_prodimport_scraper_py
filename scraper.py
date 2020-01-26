@@ -348,8 +348,9 @@ for scrapsite in jsonscrapsites:
                             if matches:
                                 prod_url = matches[0]
                             if prod_url is None or prod_url == '':
-                                print(prod_url_html)
-                                matches = re.search(r'href\=\"\K(.*?)\"', prod_url_html)
+                                #print(prod_url_html)
+                                #matches = re.search(r'href\=\"\K(.*?)\"', prod_url_html)
+                                matches = re.search(r'href\=\"(.*?)\"', prod_url_html)
                                 prod_url = matches[1]
                                 new_prod_url = urljoin(scrapsite['scrapeurl'], prod_url)
                                 if prod_url != new_prod_url:

@@ -597,6 +597,8 @@ for scrapsite in jsonscrapsites:
                                     if domainmisc_array[(i-1)] == 'sold_out':
                                         if len(domainmisc_array[i]) > 0:
                                             soldout = True
+                                    # --- Convert the scraped HTML element to HTML string before end! --- #
+                                    domainmisc_array[i] = str(etree.tostring(domainmisc_array[i]))
                             scrapedmiscitems = json.dumps(domainmisc_array)
                             #print('DOMAINMISC:')
                             #for d in domainmisc_array: print d

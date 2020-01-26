@@ -387,6 +387,8 @@ for scrapsite in jsonscrapsites:
                             for el in producttitleparts:
                                 if el is None:
                                     continue
+                                if el.text is None:
+                                    continue
                                 prod_title = prod_title + el.text + ' '
                         else:
                             title = prod_root.cssselect(scrapsite['scrapefield']['titleselector'])[0].text
@@ -697,7 +699,7 @@ for scrapsite in jsonscrapsites:
                                             image_urls = array_output[1]
                                 elif altimggrab == '2':
                                     output = re.search(r'src\=\"(.*)\"', image_dom, flags=re.U)
-                                    if output.len() > 0:
+                                    if output and output.len() > 0:
                                         removed_top_element = output.pop(0)
                                         image_urls = output
                                 else:

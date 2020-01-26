@@ -633,7 +633,7 @@ for scrapsite in jsonscrapsites:
                                         if imageval.find('//') == -1:
                                             del prodlog_image_urls[imagekey]
                                             continue
-                                        if imageval.find('blank.'):
+                                        if imageval.find('blank.') != -1:
                                             del prodlog_image_urls[imagekey]
                                             continue
                                         if imageval[0:2] == '//':
@@ -688,14 +688,14 @@ for scrapsite in jsonscrapsites:
                                         #print('HERE')
                                         del prodlog_image_urls[imagekey]
                                         continue
-                                    if imageval.find('blank.'):
-                                        print(imageval)
-                                        print(imageval.find('blank.'))
+                                    if imageval.find('blank.') != -1:
+                                        #print(imageval)
+                                        #print(imageval.find('blank.'))
                                         #print('THERE')
                                         del image_urls[imagekey]
                                         continue
                                     if ignoreurlscontainingstring != '':                                
-                                        if imageval.find(ignoreurlscontainingstring):
+                                        if imageval.find(ignoreurlscontainingstring) != -1:
                                             #print('BUT NOT HERE')
                                             del image_urls[imagekey]
                                             continue

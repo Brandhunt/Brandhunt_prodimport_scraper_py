@@ -697,11 +697,11 @@ for scrapsite in jsonscrapsites:
                                         image_urls[imagekey] = imageval
                                 image_urls_valid = list(image_urls.values())
                             print('IMAGE ELEMENTS:')
-                            for img in image_elements: print img
+                            for img in image_elements: print (img)
                             print('IMAGE URLS:')
-                            for img in image_urls: print img
+                            for img in image_urls: print (img)
                             print('VALID IMAGES:')
-                            for img in image_urls_valid: print img
+                            for img in image_urls_valid: print (img)
                         except:
                             print(traceback.format_exc())
                     #MAYBE GET NEWDOMAIN HERE?

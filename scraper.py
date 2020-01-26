@@ -699,6 +699,10 @@ for scrapsite in jsonscrapsites:
                                     output = re.finditer(r'image\=\"(.*)\"', image_dom, flags=re.U)
                                     array_output = []
                                     for output_el in output:
+                                        
+                                        for el in output_el.group():
+                                            print(el)
+                                        
                                         array_output.append(output_el.group())
                                     if len(array_output) > 1:
                                         if array_output[1].len() > 0:

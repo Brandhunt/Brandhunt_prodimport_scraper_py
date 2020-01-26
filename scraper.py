@@ -699,9 +699,10 @@ for scrapsite in jsonscrapsites:
                                             image_urls = array_output[1]
                                 elif altimggrab == '2':
                                     output = re.search(r'src\=\"(.*)\"', image_dom, flags=re.U)
-                                    if output and output.len() > 0:
-                                        removed_top_element = output.pop(0)
-                                        image_urls = output
+                                    if len(output.group()) > 0:
+                                        group = output.group()
+                                        removed_top_element = group.pop(0)
+                                        image_urls = group
                                 else:
                                     image_urls = graburls(str(image_dom), True)
                                 #print('PRE-IMAGE URLS: ')

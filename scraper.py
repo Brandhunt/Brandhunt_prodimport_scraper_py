@@ -685,16 +685,18 @@ for scrapsite in jsonscrapsites:
                                         image_urls[imagekey] = newimageval
                                         imageval = newimageval
                                     if imageval.find('//') == -1:
-                                        print('HERE')
+                                        #print('HERE')
                                         del prodlog_image_urls[imagekey]
                                         continue
                                     if imageval.find('blank.'):
-                                        print('THERE')
+                                        print(imageval)
+                                        print(imageval.find('blank.'))
+                                        #print('THERE')
                                         del image_urls[imagekey]
                                         continue
                                     if ignoreurlscontainingstring != '':                                
                                         if imageval.find(ignoreurlscontainingstring):
-                                            print('BUT NOT HERE')
+                                            #print('BUT NOT HERE')
                                             del image_urls[imagekey]
                                             continue
                                     if imageval[0:2] == '//':

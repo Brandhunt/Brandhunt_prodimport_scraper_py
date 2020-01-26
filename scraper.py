@@ -260,11 +260,11 @@ for scrapsite in jsonscrapsites:
         if scrapsite['scrapefield']['phantomjsimport'] == 'phantomjsimport_pagenumber':
             url_elements = root.cssselect(scrapsite['scrapefield']['productnumberselector'])
             if url_elements:
-                nextURLs = graburls(etree.tostring(url_elements[0]), False)
+                nextURLs = graburls(str(etree.tostring(url_elements[0])), False)
         elif scrapsite['scrapefield']['phantomjsimport'] == 'phantomjsimport_pagenumber_alt':
             url_elements = root.cssselect(scrapsite['scrapefield']['productnumberselector'])
             if url_elements:
-                nextURLs = graburls(etree.tostring(url_elements[int(int(url_elements.len()) - 1)]), False)
+                nextURLs = graburls(str(etree.tostring(url_elements[int(int(url_elements.len()) - 1)])), False)
         elif scrapsite['scrapefield']['phantomjsimport'] != 'phantomjsimport_default':
             print("Invalid scraping method - Can't use 'Standard' scraping type with method '" + scrapsite['scrapefield']['phantomjsimport'] + "'!")
             continue

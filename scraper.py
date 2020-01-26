@@ -602,7 +602,9 @@ for scrapsite in jsonscrapsites:
                                     if domainmisc_array[(i-1)] == 'pa_size':
                                         if len(domainmisc_array[i]) > 0:
                                             count = 0
-                                            for el in domainmisc_array[i]:  
+                                            for el in domainmisc_array[i]:
+                                                print(el.text)
+                                                print(domainmisc_array[i][count].text)
                                                 prod_sizes.append(domainmisc_array[i][count].text)
                                                 count = count + 1
                                     # --- Should we skip the first size alternative on information import? --- #

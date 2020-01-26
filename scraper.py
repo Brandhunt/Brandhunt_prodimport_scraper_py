@@ -598,7 +598,7 @@ for scrapsite in jsonscrapsites:
                                         if len(domainmisc_array[i]) > 0:
                                             soldout = True
                                     # --- Convert the scraped HTML element to HTML string before end! --- #
-                                    if type(domainmisc_array[i]) == 'list:
+                                    if type(domainmisc_array[i]) == 'list':
                                         count = 0
                                         for el in domainmisc_array[i]:
                                             domainmisc_array[i][count] = str(etree.tostring(el))

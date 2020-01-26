@@ -657,11 +657,12 @@ for scrapsite in jsonscrapsites:
                             scrapsite['scrapefield']['imageselector'] = scrapsite['scrapefield']['imageselector'].encode().decode("unicode-escape")
                             #image_urls = ''
                             image_elements = prod_root.cssselect(scrapsite['scrapefield']['imageselector'])
+                            for i in image_elements: print(i)
                             if image_elements:
                                 for i in range(len(image_elements)):
                                     image_elements[i] = str(etree.tostring(image_elements[i]))
                                 image_dom = ','.join(image_elements)
-                                #print('IMAGE DOM: ' + image_dom)
+                                print('IMAGE DOM: ' + image_dom)
                                 if altimggrab == '1':
                                     output = re.finditer(r'image\=\"(.*)\"', image_dom, flags.U)
                                     if output[1].len() > 0:

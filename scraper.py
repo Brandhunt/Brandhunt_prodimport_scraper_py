@@ -677,9 +677,9 @@ for scrapsite in jsonscrapsites:
                                 #print('IMAGE DOM: ' + image_dom)
                                 if altimggrab == '1':
                                     output = re.finditer(r'image\=\"(.*)\"', image_dom, flags=re.U)
-                                    if output[1].len() > 0:
+                                    if output[1].group().len() > 0:
                                         #removed_top_element = output.pop(0)
-                                        image_urls = output[1]
+                                        image_urls = output[1].group()
                                 elif altimggrab == '2':
                                     output = re.search(r'src\=\"(.*)\"', image_dom, flags=re.U)
                                     if output.len() > 0:

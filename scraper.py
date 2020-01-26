@@ -680,6 +680,7 @@ for scrapsite in jsonscrapsites:
                             if len(image_urls) > 0:
                                 for imagekey, imageval in image_urls.copy().items():
                                     newimageval = urljoin(scrapsite['scrapeurl'], imageval)
+                                    print('NEWIMGVAL: ' + newimageval)
                                     if imageval != newimageval:
                                         image_urls[imagekey] = newimageval
                                         imageval = newimageval

@@ -689,9 +689,10 @@ for scrapsite in jsonscrapsites:
                                     if imageval.find('blank.'):
                                         del image_urls[imagekey]
                                         continue
-                                    if imageval.find(ignoreurlscontainingstring):
-                                        del image_urls[imagekey]
-                                        continue
+                                    if ignoreurlscontainingstring != '':                                
+                                        if imageval.find(ignoreurlscontainingstring):
+                                            del image_urls[imagekey]
+                                            continue
                                     if imageval[0:2] == '//':
                                         imageval = 'https:' + imageval
                                         image_urls[imagekey] = imageval

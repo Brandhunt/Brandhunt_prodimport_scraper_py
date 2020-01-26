@@ -600,6 +600,8 @@ for scrapsite in jsonscrapsites:
                                             else:
                                                 prod_categories = prodcat_array
                                     if domainmisc_array[(i-1)] == 'pa_size':
+                                        print(prod_html)
+                                        print(domainmisc_array[i])
                                         if len(domainmisc_array[i]) > 0:
                                             count = 0
                                             for el in domainmisc_array[i]:

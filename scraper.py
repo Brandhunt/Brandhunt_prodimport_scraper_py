@@ -215,8 +215,8 @@ for scrapsite in jsonscrapsites:
             if err.code == 404:
                 notfound = True
                 removeon404 = False
-                if scrapsite['scrapeurl']['domainmisc']:
-                    if scrapsite['scrapeurl']['domainmisc'].find('allow_remove_on_404'):
+                if scrapsite['scrapefield']['domainmisc']:
+                    if scrapsite['scrapefield']['domainmisc'].find('allow_remove_on_404'):
                         removeon404 = True
                 try:
                     scraperwiki.sqlite.save(unique_keys=['scrapeurl'],\

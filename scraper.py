@@ -702,12 +702,11 @@ for scrapsite in jsonscrapsites:
                                     output = re.finditer(r'image\=\"(.*?)\"', image_dom)
                                     array_output = []
                                     for output_el in output:
-                                        print(output_el.group(1))
-                                        array_output.append(output_el.group())
-                                    if len(array_output) > 1:
-                                        if array_output[1].len() > 0:
-                                            #removed_top_element = output.pop(0)
-                                            image_urls = array_output[1]
+                                        #print(output_el.group(1))
+                                        array_output.append(output_el.group(1))
+                                    if len(array_output) > 0:
+                                        #removed_top_element = output.pop(0)
+                                        image_urls = array_output
                                 elif altimggrab == '2':
                                     #output = re.search(r'src\=\"(.*)\"', image_dom, flags=re.U)
                                     output = re.search(r'src\=\"(.*?)\"', image_dom)

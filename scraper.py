@@ -436,7 +436,7 @@ for scrapsite in jsonscrapsites:
                         #print(scrapsite['scrapefield']['priceselector'])
                         if scrapsite['scrapefield']['priceselector'].find('[multiple],') != -1:
                             scrapsite['scrapefield']['priceselector'].replace('[multiple],', '')
-                            prod_price_elements = root.cssselect(scrapsite['scrapefield']['priceselector'])
+                            prod_price_elements = prod_root.cssselect(scrapsite['scrapefield']['priceselector'])
                             for el in prod_price_elements:
                                 if el is None:
                                     continue
@@ -444,7 +444,7 @@ for scrapsite in jsonscrapsites:
                             if prod_price != '':
                                 prod_price = re.sub(r'([^a-zA-Z]\w+\%+)', '', prod_price)
                         else:
-                            prod_price_elements = root.cssselect(scrapsite['scrapefield']['priceselector'])
+                            prod_price_elements = prod_root.cssselect(scrapsite['scrapefield']['priceselector'])
                             if prod_price_elements:
                                 for price_el in prod_price_elements:
                                     if price_el.text is not None:
@@ -470,7 +470,7 @@ for scrapsite in jsonscrapsites:
                     if scrapsite['scrapefield']['salespriceselector']:
                         try:
                             scrapsite['scrapefield']['salespriceselector'] = scrapsite['scrapefield']['salespriceselector'].encode().decode("unicode-escape")
-                            prod_salesprice_elements = root.cssselect(scrapsite['scrapefield']['salespriceselector'])   
+                            prod_salesprice_elements = prod_root.cssselect(scrapsite['scrapefield']['salespriceselector'])   
                             if prod_salesprice_elements:
                                 if any(char.isdigit() for char in prod_salesprice_elements[0].text):
                                     prod_salesprice = prod_salesprice_elements[0].text
@@ -656,7 +656,7 @@ for scrapsite in jsonscrapsites:
                         try:
                             scrapsite['scrapefield']['imageselector'] = scrapsite['scrapefield']['imageselector'].encode().decode("unicode-escape")
                             #image_urls = ''
-                            image_elements = root.cssselect(scrapsite['scrapefield']['imageselector'])
+                            image_elements = prod_root.cssselect(scrapsite['scrapefield']['imageselector'])
                             if image_elements:
                                 for i in range(len(image_elements)):
                                     image_elements[i] = str(etree.tostring(image_elements[i]))

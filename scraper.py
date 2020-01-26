@@ -625,12 +625,12 @@ for scrapsite in jsonscrapsites:
                                     prodlog_image_elements[i] = etree.tostring(prodlog_image_elements[i])
                                 image_dom = ','.join(prodlog_image_elements)
                                 if altimggrab == '1':
-                                    output = re.search(r'image\=\"(.*)\"', image_dom, flags.U)
+                                    output = re.search(r'image\=\"(.*)\"', image_dom, flags=re.U)
                                     if output.len() > 0:
                                         removed_top_element = output.pop(0)
                                         prodlog_image_urls = output
                                 elif altimggrab == '2':
-                                    output = re.search(r'src\=\"(.*)\"', image_dom, flags.U)
+                                    output = re.search(r'src\=\"(.*)\"', image_dom, flags=re.U)
                                     if output.len() > 0:
                                         removed_top_element = output.pop(0)
                                         prodlog_image_urls = output
@@ -676,12 +676,12 @@ for scrapsite in jsonscrapsites:
                                 image_dom = ','.join(image_elements)
                                 #print('IMAGE DOM: ' + image_dom)
                                 if altimggrab == '1':
-                                    output = re.finditer(r'image\=\"(.*)\"', image_dom, flags.U)
+                                    output = re.finditer(r'image\=\"(.*)\"', image_dom, flags=re.U)
                                     if output[1].len() > 0:
                                         #removed_top_element = output.pop(0)
                                         image_urls = output[1]
                                 elif altimggrab == '2':
-                                    output = re.search(r'src\=\"(.*)\"', image_dom, flags.U)
+                                    output = re.search(r'src\=\"(.*)\"', image_dom, flags=re.U)
                                     if output.len() > 0:
                                         removed_top_element = output.pop(0)
                                         image_urls = output

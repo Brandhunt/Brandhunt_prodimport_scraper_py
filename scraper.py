@@ -657,12 +657,12 @@ for scrapsite in jsonscrapsites:
                             scrapsite['scrapefield']['imageselector'] = scrapsite['scrapefield']['imageselector'].encode().decode("unicode-escape")
                             #image_urls = ''
                             image_elements = prod_root.cssselect(scrapsite['scrapefield']['imageselector'])
-                            for i in image_elements: print(i)
+                            #for i in image_elements: print(i)
                             if image_elements:
                                 for i in range(len(image_elements)):
                                     image_elements[i] = str(etree.tostring(image_elements[i]))
                                 image_dom = ','.join(image_elements)
-                                print('IMAGE DOM: ' + image_dom)
+                                #print('IMAGE DOM: ' + image_dom)
                                 if altimggrab == '1':
                                     output = re.finditer(r'image\=\"(.*)\"', image_dom, flags.U)
                                     if output[1].len() > 0:
@@ -696,12 +696,12 @@ for scrapsite in jsonscrapsites:
                                         imageval = 'https:' + imageval
                                         image_urls[imagekey] = imageval
                                 image_urls_valid = list(image_urls.values())
-                            #print('IMAGE ELEMENTS:')
-                            #for img in image_elements: print img
-                            #print('IMAGE URLS:')
-                            #for img in image_urls: print img
-                            #print('VALID IMAGES:')
-                            #for img in image_urls_valid: print img
+                            print('IMAGE ELEMENTS:')
+                            for img in image_elements: print img
+                            print('IMAGE URLS:')
+                            for img in image_urls: print img
+                            print('VALID IMAGES:')
+                            for img in image_urls_valid: print img
                         except:
                             print(traceback.format_exc())
                     #MAYBE GET NEWDOMAIN HERE?

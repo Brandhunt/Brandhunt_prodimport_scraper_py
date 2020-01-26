@@ -203,7 +203,7 @@ for scrapsite in jsonscrapsites:
     if not scrapsite['scrapefield']['phantomjsimport']:
         scrapsite['scrapefield']['phantomjsimport'] = 'phantomjsimport_pagenumber'
     # >>> GET THE HTML <<< #
-    if scrapsite['scrapefield']['scrapetype'] == 'standard':
+    if scrapsite['scrapefield']['scrapetype'] == 'standard_morph_io':
         html = ''
         root = ''
         nextURLs = ''

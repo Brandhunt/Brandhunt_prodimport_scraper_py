@@ -122,6 +122,7 @@ def graburls(text, imageonly):
         return { i : finalmatches[i] for i in range(0, len(finalmatches)) }
     except:
         print('Error grabbing urls!')
+        print(traceback.format_exc())
         return []
     
 # *** --- For converting relative URLs to absolute URLs --- *** #

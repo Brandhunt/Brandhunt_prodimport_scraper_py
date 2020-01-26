@@ -700,6 +700,7 @@ for scrapsite in jsonscrapsites:
                                     array_output = []
                                     for output_el in output:
                                         
+                                        print(image_dom)
                                         print('HEPP')
                                         print(output_el.group())
                                         print('HUPP')

@@ -680,7 +680,7 @@ for scrapsite in jsonscrapsites:
                             if len(image_urls) > 0:
                                 for imagekey, imageval in image_urls.copy().items():
                                     newimageval = urljoin(scrapsite['scrapeurl'], imageval)
-                                    print('NEWIMGVAL: ' + newimageval)
+                                    #print('NEWIMGVAL: ' + newimageval)
                                     if imageval != newimageval:
                                         image_urls[imagekey] = newimageval
                                         imageval = newimageval
@@ -700,10 +700,10 @@ for scrapsite in jsonscrapsites:
                                 image_urls_valid = list(image_urls.values())
                             #print('IMAGE ELEMENTS:')
                             #for img in image_elements: print (img)
-                            #print('IMAGE URLS:')
-                            #for img in image_urls: print (img)
-                            #print('VALID IMAGES:')
-                            #for img in image_urls_valid: print (img)
+                            print('IMAGE URLS:')
+                            for img in image_urls: print (img)
+                            print('VALID IMAGES:')
+                            for img in image_urls_valid: print (img)
                         except:
                             print(traceback.format_exc())
                     #MAYBE GET NEWDOMAIN HERE?

@@ -623,7 +623,7 @@ for scrapsite in jsonscrapsites:
                                         removed_top_element = output.pop(0)
                                         prodlog_image_urls = output
                                 else:
-                                    prodlog_image_urls = graburls(image_dom, True)
+                                    prodlog_image_urls = graburls(str(image_dom), True)
                                 if len(prodlog_image_urls) > 0:
                                     for imagekey, imageval in prodlog_image_urls.copy().items():
                                         newimageval = urljoin(scrapsite['scrapeurl'], imageval)
@@ -662,7 +662,7 @@ for scrapsite in jsonscrapsites:
                                 for i in range(len(image_elements)):
                                     image_elements[i] = str(etree.tostring(image_elements[i]))
                                 image_dom = ','.join(image_elements)
-                                print('IMAGE DOM: ' + image_dom)
+                                #print('IMAGE DOM: ' + image_dom)
                                 if altimggrab == '1':
                                     output = re.finditer(r'image\=\"(.*)\"', image_dom, flags.U)
                                     if output[1].len() > 0:
@@ -674,7 +674,7 @@ for scrapsite in jsonscrapsites:
                                         removed_top_element = output.pop(0)
                                         image_urls = output
                                 else:
-                                    image_urls = graburls(image_dom, True)
+                                    image_urls = graburls(str(image_dom), True)
                                 #print('PRE-IMAGE URLS: ')
                                 #for img in image_urls: print(img)
                             if len(image_urls) > 0:

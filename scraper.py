@@ -700,8 +700,7 @@ for scrapsite in jsonscrapsites:
                                     array_output = []
                                     for output_el in output:
                                         
-                                        for el in output_el.group():
-                                            print(el)
+                                        print(output_el)
                                         
                                         array_output.append(output_el.group())
                                     if len(array_output) > 1:

@@ -568,6 +568,9 @@ for scrapsite in jsonscrapsites:
                                 elif domainmisc_array[(i-1)] == 'is_female':
                                     femaletruemalefalse = 'F'
                                 # --> Attempt scraping of product misc. elements:
+                                if domainmisc_array[(i-1)] == 'pa_size':
+                                    print('TOSCRAPE: ' + domainmisc_array[i].strip().encode().decode("unicode-escape"))
+                                    print(prod_html)
                                 domainmisc_array[i] = prod_root.cssselect(domainmisc_array[i].strip().encode().decode("unicode-escape"))
                                 if domainmisc_array[i]:
                                     # --- Has the product got any special sale price applied? --- #
@@ -600,13 +603,13 @@ for scrapsite in jsonscrapsites:
                                             else:
                                                 prod_categories = prodcat_array
                                     if domainmisc_array[(i-1)] == 'pa_size':
-                                        print(prod_html)
-                                        print(domainmisc_array[i])
+                                        #print(prod_html)
+                                        #print(domainmisc_array[i])
                                         if len(domainmisc_array[i]) > 0:
                                             count = 0
                                             for el in domainmisc_array[i]:
-                                                print(el.text)
-                                                print(domainmisc_array[i][count].text)
+                                                #print(el.text)
+                                                #print(domainmisc_array[i][count].text)
                                                 prod_sizes.append(domainmisc_array[i][count].text)
                                                 count = count + 1
                                     # --- Should we skip the first size alternative on information import? --- #

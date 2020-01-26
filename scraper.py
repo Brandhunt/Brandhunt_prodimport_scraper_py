@@ -568,9 +568,9 @@ for scrapsite in jsonscrapsites:
                                 elif domainmisc_array[(i-1)] == 'is_female':
                                     femaletruemalefalse = 'F'
                                 # --> Attempt scraping of product misc. elements:
-                                if domainmisc_array[(i-1)] == 'pa_size':
-                                    print('TOSCRAPE: ' + domainmisc_array[i].strip().encode().decode("unicode-escape"))
-                                    print(prod_html)
+                                #if domainmisc_array[(i-1)] == 'pa_size':
+                                #    print('TOSCRAPE: ' + domainmisc_array[i].strip().encode().decode("unicode-escape"))
+                                #    print(prod_html)
                                 domainmisc_array[i] = prod_root.cssselect(domainmisc_array[i].strip().encode().decode("unicode-escape"))
                                 if domainmisc_array[i]:
                                     # --- Has the product got any special sale price applied? --- #

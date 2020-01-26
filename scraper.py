@@ -675,8 +675,8 @@ for scrapsite in jsonscrapsites:
                                         image_urls = output
                                 else:
                                     image_urls = graburls(str(image_dom), True)
-                                print('PRE-IMAGE URLS: ')
-                                for img in image_urls: print(image_urls[img])
+                                #print('PRE-IMAGE URLS: ')
+                                #for img in image_urls: print(image_urls[img])
                             if len(image_urls) > 0:
                                 for imagekey, imageval in image_urls.copy().items():
                                     newimageval = urljoin(scrapsite['scrapeurl'], imageval)
@@ -684,8 +684,8 @@ for scrapsite in jsonscrapsites:
                                         image_urls[imagekey] = newimageval
                                         imageval = newimageval
                                     if imageval.find('//') == -1:
-                                            del prodlog_image_urls[imagekey]
-                                            continue
+                                        del prodlog_image_urls[imagekey]
+                                        continue
                                     if imageval.find('blank.'):
                                         del image_urls[imagekey]
                                         continue

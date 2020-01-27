@@ -588,6 +588,7 @@ for scrapsite in jsonscrapsites:
                                     if domainmisc_array[(i-1)] == 'pa_color':
                                         if len(domainmisc_array[i]) > 0:
                                             count = 0
+                                            prod_colors = []
                                             for el in domainmisc_array[i]:  
                                                 prod_colors.append(domainmisc_array[i][count].text)
                                                 count = count + 1

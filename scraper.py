@@ -648,15 +648,19 @@ for scrapsite in jsonscrapsites:
                                 if altimggrab == '1':
                                     #output = re.search(r'image\=\"(.*)\"', image_dom, flags=re.U)
                                     output = re.search(r'image\=\"(.*?)\"', image_dom)
-                                    if output.len() > 0:
-                                        removed_top_element = output.pop(0)
-                                        prodlog_image_urls = output
+                                    if len(output.group(1)) > 0:
+                                        prodlog_image_urls = { 0 : output.group(1) }
+                                    #if output.len() > 0:
+                                    #    removed_top_element = output.pop(0)
+                                    #    prodlog_image_urls = output
                                 elif altimggrab == '2':
                                     #output = re.search(r'src\=\"(.*)\"', image_dom, flags=re.U)
                                     output = re.search(r'src\=\"(.*?)\"', image_dom)
-                                    if output.len() > 0:
-                                        removed_top_element = output.pop(0)
-                                        prodlog_image_urls = output
+                                    if len(output.group(1)) > 0:
+                                        prodlog_image_urls = { 0 : output.group(1) }
+                                    #if output.len() > 0:
+                                    #    removed_top_element = output.pop(0)
+                                    #    prodlog_image_urls = output
                                 else:
                                     prodlog_image_urls = graburls(str(image_dom), True)
                                 if len(prodlog_image_urls) > 0:
@@ -711,10 +715,12 @@ for scrapsite in jsonscrapsites:
                                 elif altimggrab == '2':
                                     #output = re.search(r'src\=\"(.*)\"', image_dom, flags=re.U)
                                     output = re.search(r'src\=\"(.*?)\"', image_dom)
-                                    if len(output.group()) > 0:
-                                        group = output.group()
-                                        removed_top_element = group.pop(0)
-                                        image_urls = group
+                                    if len(output.group(1)) > 0:
+                                        image_urls = { 0 : output.group(1) }
+                                    #if len(output.group()) > 0:
+                                    #    group = output.group()
+                                    #    removed_top_element = group.pop(0)
+                                    #    image_urls = group
                                 else:
                                     image_urls = graburls(str(image_dom), True)
                                 #print('PRE-IMAGE URLS: ')

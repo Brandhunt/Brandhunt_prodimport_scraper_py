@@ -7,6 +7,6 @@
 
 lxml~=4.3.3
 cssselect~=1.0.0
-mysql-connector-python==8.0.11
+mysql-connector-python==8.0.14
 scraperwiki==0.5.1
 python-slugify>=4.0.0
